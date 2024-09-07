@@ -190,7 +190,7 @@ public class BlockGenerator {
     private String metadata() {
         return """
         // THIS FILE IS GENERATED FROM MINECRAFT DATA, DO NOT EDIT
-        // https://github.com/Cosmorise/Passport/generator/src/main/java/me/combimagnetron/passport/generator/ItemGenerator.java
+        // https://github.com/Cosmorise/Passport/generator/src/main/java/me/combimagnetron/passport/generator/BlockGenerator.java
         """;
     }
 
