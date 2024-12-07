@@ -1,12 +1,10 @@
 package me.combimagnetron.passport.internal.entity;
 
-import me.combimagnetron.comet.data.Identifier;
+import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
-import me.combimagnetron.passport.internal.network.packet.client.ClientEntityMetadata;
-import me.combimagnetron.passport.internal.network.packet.client.ClientSpawnEntity;
 import net.kyori.adventure.text.Component;
 
 import java.util.Collection;
@@ -221,8 +219,8 @@ public interface Entity {
         @Override
         public void show() {
             for (Viewer viewer : viewers) {
-                viewer.user().connection().send(ClientSpawnEntity.spawnEntity(this));
-                viewer.user().connection().send(ClientEntityMetadata.entityMetadata(this));
+                //viewer.user().connection().send(ClientSpawnEntity.spawnEntity(this));
+                //viewer.user().connection().send(ClientEntityMetadata.entityMetadata(this));
             }
         }
 

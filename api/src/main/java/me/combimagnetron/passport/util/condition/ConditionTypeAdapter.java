@@ -1,6 +1,6 @@
 package me.combimagnetron.passport.util.condition;
 
-import me.combimagnetron.passport.CometBase;
+import me.combimagnetron.passport.Passport;
 import me.combimagnetron.passport.user.User;
 
 import java.lang.reflect.Field;
@@ -14,7 +14,7 @@ public record ConditionTypeAdapter<V>(Function<String, V> get) {
     public static final ConditionTypeAdapter<Float> FLOAT = of(Float::parseFloat);
     public static final ConditionTypeAdapter<Short> SHORT = of(Short::parseShort);
     public static final ConditionTypeAdapter<Boolean> BOOLEAN = of(Boolean::parseBoolean);
-    public static final ConditionTypeAdapter<User<?>> USER = of(s -> CometBase.comet().users().users().stream().filter(user -> user.name().equals(s)).findAny().orElse(null));
+    public static final ConditionTypeAdapter<User<?>> USER = of(s -> Passport.passport().users().users().stream().filter(user -> user.name().equals(s)).findAny().orElse(null));
     public static final ConditionTypeAdapter<String> STRING = of(s -> s);
 
     public static <V> ConditionTypeAdapter<V> of(Function<String, V> retrieve) {

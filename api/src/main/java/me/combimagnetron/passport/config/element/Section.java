@@ -11,6 +11,8 @@ public interface Section extends ConfigElement {
 
     <T> @NotNull Section node(Node<T> node);
 
+    @NotNull Section section(Section section);
+
     <T extends ConfigElement> @NotNull T find(String name);
 
     <T extends ConfigElement> @Nullable T next(@NotNull Class<T> clazz);
@@ -34,6 +36,12 @@ public interface Section extends ConfigElement {
         @Override
         public <T> @NotNull Section node(Node<T> node) {
             elements.put(node.name(), node);
+            return this;
+        }
+
+        @Override
+        public @NotNull Section section(Section section) {
+            elements.put(section.name(), section);
             return this;
         }
 

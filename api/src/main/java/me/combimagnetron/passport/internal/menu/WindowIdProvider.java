@@ -1,6 +1,6 @@
 package me.combimagnetron.passport.internal.menu;
 
-import me.combimagnetron.comet.util.Pair;
+import me.combimagnetron.passport.util.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;

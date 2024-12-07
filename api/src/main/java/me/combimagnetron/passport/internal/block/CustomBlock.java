@@ -1,4 +1,4 @@
 package me.combimagnetron.passport.internal.block;
 
-public interface CustomBlock extends Block {
+public interface CustomBlock {
 }

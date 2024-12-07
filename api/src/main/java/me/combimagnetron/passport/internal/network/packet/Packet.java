@@ -1,11 +1,6 @@
 package me.combimagnetron.passport.internal.network.packet;
 
-import me.combimagnetron.passport.internal.network.packet.client.ClientOpenScreen;
-import me.combimagnetron.passport.internal.network.packet.client.ClientSetScreenContent;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
-import me.combimagnetron.passport.internal.network.packet.server.ServerClickContainer;
-import me.combimagnetron.passport.internal.network.packet.server.ServerCloseContainer;
-import me.combimagnetron.passport.internal.network.packet.server.ServerSetPlayerRotation;
 
 public interface Packet {
 
@@ -45,14 +40,14 @@ public interface Packet {
         Class<T> clazz();
 
         interface Client {
-            Type<ClientSetScreenContent> SET_SCREEN_CONTENT = Impl.of(ClientSetScreenContent.class);
-            Type<ClientOpenScreen> OPEN_WINDOW = Impl.of(ClientOpenScreen.class);
+            //Type<ClientSetScreenContent> SET_SCREEN_CONTENT = Impl.of(ClientSetScreenContent.class);
+            //Type<ClientOpenScreen> OPEN_WINDOW = Impl.of(ClientOpenScreen.class);
         }
 
         interface Server {
-            Type<ServerClickContainer> CLICK_CONTAINER = Impl.of(ServerClickContainer.class);
-            Type<ServerCloseContainer> CLOSE_CONTAINER = Impl.of(ServerCloseContainer.class);
-            Type<ServerSetPlayerRotation> SET_PLAYER_ROTATION = Impl.of(ServerSetPlayerRotation.class);
+            //Type<ServerClickContainer> CLICK_CONTAINER = Impl.of(ServerClickContainer.class);
+            //Type<ServerCloseContainer> CLOSE_CONTAINER = Impl.of(ServerCloseContainer.class);
+            //Type<ServerSetPlayerRotation> SET_PLAYER_ROTATION = Impl.of(ServerSetPlayerRotation.class);
         }
 
         record Impl<T extends Packet>(Class<T> clazz) implements Type<T> {

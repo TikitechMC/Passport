@@ -13,6 +13,10 @@ public interface TokenizedResult {
 
     Token.Type token(int index);
 
+    default boolean empty() {
+        return ordered().all().isEmpty();
+    }
+
     Collection<MatcherResult> all(Token.Type type);
 
     OrderedView ordered();

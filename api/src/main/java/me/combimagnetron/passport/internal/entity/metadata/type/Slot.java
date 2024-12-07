@@ -1,12 +1,12 @@
 package me.combimagnetron.passport.internal.entity.metadata.type;
 
 import me.combimagnetron.passport.internal.network.ByteBuffer;
-import me.combimagnetron.comet.internal.Item;
+import me.combimagnetron.passport.internal.item.Item;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public record Slot(@NonNull Item<?> item) implements MetadataType {
+public record Slot(@NonNull Item item) implements MetadataType {
 
-    public static Slot of(Item<?> item) {
+    public static Slot of(Item item) {
         return new Slot(item);
     }
 

@@ -1,5 +1,6 @@
 package me.combimagnetron.passport.internal.item;
 
+import me.combimagnetron.generated.R1_21.item.Material;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jglrxavpok.hephaistos.nbt.NBT;
@@ -14,19 +15,47 @@ import java.util.function.Function;
 
 public interface Item {
 
+    Item customModelData(int customModelData);
 
+    Item name(Component name);
 
-    class Impl<M> {
-        private final static Impl<Integer> EMPTY = Impl.item(/*9648*/ 26842);
+    Item lore(Component... lore);
+
+    Material material();
+
+    int customModelData();
+
+    Component name();
+
+    int amount();
+
+    Collection<Component> lore();
+
+    NBTCompound nbt();
+
+    static Item item(Material material) {
+        return Impl.item(material);
+    }
+
+    static Item item(Material material, int amount) {
+        return Impl.item(material, amount);
+    }
+
+    static Item empty() {
+        return Impl.empty();
+    }
+
+    class Impl implements Item {
+        private final static Impl EMPTY = Impl.item(Material.AIR);
         private List<Component> lore = new ArrayList<>();
         private MutableNBTCompound nbtCompound;
         private MutableNBTCompound tag;
         private int amount;
-        private final M material;
+        private final Material material;
         private int customModelData;
         private Component name;
 
-        private Impl(M material, int amount) {
+        private Impl(Material material, int amount) {
             this.material = material;
             this.amount = amount;
             this.nbtCompound = NBTCompound.EMPTY.toMutableCompound();
@@ -36,32 +65,32 @@ public interface Item {
             this.tag.set("display", NBTCompound.EMPTY);
         }
 
-        public static <T> Impl<T> item(T material) {
-            return new Impl<>(material, 1);
+        public static Impl item(Material material) {
+            return new Impl(material, 1);
         }
 
-        public static <T> Impl<T> item(T material, int amount) {
-            return new Impl<>(material, amount);
+        public static Impl item(Material material, int amount) {
+            return new Impl(material, amount);
         }
 
-        public static Impl<?> empty() {
+        public static Impl empty() {
             return EMPTY;
         }
 
-        public Impl<M> customModelData(int customModelData) {
+        public Impl customModelData(int customModelData) {
             this.customModelData = customModelData;
             this.nbtCompound.set("CustomModelData", NBT.Int(this.customModelData));
             return this;
         }
 
-        public Impl<M> name(Component name) {
+        public Impl name(Component name) {
             this.name = name;
             this.nbtCompound.getCompound("display")
                     .modify(builder -> builder.set("Name", NBT.String(GsonComponentSerializer.gson().serialize(this.name))));
             return this;
         }
 
-        public Impl<M> lore(Component... lore) {
+        public Impl lore(Component... lore) {
             this.lore.addAll(List.of(lore));
             this.nbtCompound.getCompound("display")
                     .modify(builder -> {
@@ -72,7 +101,7 @@ public interface Item {
             return this;
         }
 
-        public M material() {
+        public Material material() {
             return this.material;
         }
 
@@ -96,7 +125,7 @@ public interface Item {
             return nbtCompound.toCompound();
         }
 
-        public record Slot(Impl<?> item, int slot) {
+        public record Slot(Impl item, int slot) {
 
         }
 

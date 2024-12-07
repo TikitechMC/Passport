@@ -1,14 +1,10 @@
 package me.combimagnetron.passport.internal.menu;
 
-import me.combimagnetron.comet.game.menu.Pos2D;
+import me.combimagnetron.passport.util.Pos2D;
 import me.combimagnetron.passport.internal.network.Connection;
-import me.combimagnetron.passport.internal.network.packet.client.ClientBundleDelimiter;
-import me.combimagnetron.passport.internal.network.packet.client.ClientOpenScreen;
-import me.combimagnetron.passport.internal.network.packet.client.ClientSetScreenSlot;
-import me.combimagnetron.comet.internal.Item;
-import me.combimagnetron.passport.internal.network.packet.server.ServerClickContainer;
-import me.combimagnetron.comet.user.User;
-import me.combimagnetron.comet.util.Pair;
+import me.combimagnetron.passport.internal.item.Item;
+import me.combimagnetron.passport.user.User;
+import me.combimagnetron.passport.util.Pair;
 import net.kyori.adventure.text.Component;
 
 import java.util.Collection;
@@ -27,9 +23,9 @@ public interface ChestMenu {
 
     void title(Title title);
 
-    void item(Pos2D pos2D, Item<?> item);
+    void item(Pos2D pos2D, Item item);
 
-    void click(ServerClickContainer packet);
+    //void click(ServerClickContainer packet);
 
     static ChestMenu menu(User<?> viewer) {
         return new Impl(viewer);
@@ -50,15 +46,15 @@ public interface ChestMenu {
         }
 
         private void open() {
-            final ClientOpenScreen openScreen = ClientOpenScreen.of(windowId, 5, title.next());
+            //final ClientOpenScreen openScreen = ClientOpenScreen.of(windowId, 5, title.next());
             //final ClientSetScreenContent setScreenContent = ClientSetScreenContent.of(contents.all(), AdapterImpl.empty(), 0, windowId);
-            connection.send(openScreen);
+            //connection.send(openScreen);
             //connection.send(setScreenContent);
             //refresh();
         }
 
         private void refresh() {
-            connection.send(ClientBundleDelimiter.bundleDelimiter(contents.pairStream().map(pair -> ClientSetScreenSlot.of(windowId, 0, pair.first().shortValue(), pair.second())).toList().toArray(new ClientSetScreenSlot[0])));
+            //connection.send(ClientBundleDelimiter.bundleDelimiter(contents.pairStream().map(pair -> ClientSetScreenSlot.of(windowId, 0, pair.first().shortValue(), pair.second())).toList().toArray(new ClientSetScreenSlot[0])));
         }
 
         @Override
@@ -77,14 +73,14 @@ public interface ChestMenu {
         }
 
         @Override
-        public void item(Pos2D pos2D, Item<?> item) {
+        public void item(Pos2D pos2D, Item item) {
 
         }
 
-        @Override
-        public void click(ServerClickContainer packet) {
+        //@Override
+        //public void click(ServerClickContainer packet) {
 
-        }
+        //}
     }
 
     final class Contents {
@@ -103,19 +99,19 @@ public interface ChestMenu {
             }
         }
 
-        public void set(Pos2D pos, Item<?> item) {
+        public void set(Pos2D pos, Item item) {
             Row row = rows.get((int) pos.y());
             row.list.set((int) pos.x(), item);
             updateConsumer.accept(this);
         }
 
-        public Item<?> get(Pos2D pos) {
+        public Item get(Pos2D pos) {
             Row row = rows.get((int) pos.y());
             return row.list.get((int) pos.x());
         }
 
-        public Collection<Item<?>> all() {
-            final LinkedHashSet<Item<?>> items = new LinkedHashSet<>();
+        public Collection<Item> all() {
+            final LinkedHashSet<Item> items = new LinkedHashSet<>();
             rows.forEach(row -> items.addAll(row.list));
             return items;
         }
@@ -128,10 +124,10 @@ public interface ChestMenu {
             return rows;
         }
 
-        public Stream<Pair<Integer, Item<?>>> pairStream() {
-            final LinkedList<Pair<Integer, Item<?>>> list = new LinkedList<>();
+        public Stream<Pair<Integer, Item>> pairStream() {
+            final LinkedList<Pair<Integer, Item>> list = new LinkedList<>();
             AtomicInteger slot = new AtomicInteger();
-            rows.forEach(row -> list.addAll((Collection<? extends Pair<Integer, Item<?>>>) row.list.stream().map(item -> Pair.of(slot.getAndIncrement(), item)).toList()));
+            rows.forEach(row -> list.addAll(row.list.stream().map(item -> Pair.of(slot.getAndIncrement(), item)).toList()));
             return list.stream();
         }
 
@@ -143,26 +139,26 @@ public interface ChestMenu {
             return rows.size();
         }
 
-        public record Row(LinkedList<Item<?>> list) {
+        public record Row(LinkedList<Item> list) {
 
             static Row empty() {
                 return new Row(new LinkedList<>());
             }
 
-            static Row of(LinkedList<Item<?>> list) {
+            static Row of(LinkedList<Item> list) {
                 return new Row(list);
             }
 
         }
 
-        public record Column(LinkedList<Item<?>> list) {
+        public record Column(LinkedList<Item> list) {
 
-            static Column of(LinkedList<Item<?>> list) {
+            static Column of(LinkedList<Item> list) {
                 return new Column(list);
             }
 
             static Column from(Contents contents, int index) {
-                final LinkedList<Item<?>> itemList = new LinkedList<>();
+                final LinkedList<Item> itemList = new LinkedList<>();
                 contents.rows.forEach(row -> itemList.add(row.list.get(index)));
                 return new Column(itemList);
             }

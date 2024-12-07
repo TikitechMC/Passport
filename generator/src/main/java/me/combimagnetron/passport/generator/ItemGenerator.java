@@ -13,7 +13,7 @@ import java.util.List;
 public class ItemGenerator {
     private final List<JsonItem> items;
 
-    public ItemGenerator(File file) {
+    public ItemGenerator(File file, String version) {
         try {
             items = new Gson().fromJson(new FileReader(file), new TypeToken<ArrayList<JsonItem>>() {}.getType());
         } catch (FileNotFoundException e) {
@@ -21,7 +21,7 @@ public class ItemGenerator {
         }
         //System.out.println(metadata() + header() + content() + "}");
         try {
-            Util.write("api/src/main/java/me/combimagnetron/generated/item/Material.java", metadata() + header() + content() + footer());
+            Util.write("api/src/main/java/me/combimagnetron/generated/R" + version.replaceAll("\\.", "_") + "/item/Material.java", metadata() + header(version) + content() + footer());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -72,40 +72,54 @@ public class ItemGenerator {
         """;
     }
 
-    private String header() {
-        return """
-        package me.combimagnetron.generated.item;
-        
-        import net.kyori.adventure.text.Component;
-        import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-        import org.jglrxavpok.hephaistos.nbt.NBT;
-        import org.jglrxavpok.hephaistos.nbt.NBTCompound;
-        import org.jglrxavpok.hephaistos.nbt.mutable.MutableNBTCompound;
-        
+    private String header(String version) {
+        String firstLine = "package me.combimagnetron.generated.R" + version.replaceAll("\\.", "_") + ".item;\n";
+        return firstLine + """
+
+        import me.combimagnetron.passport.internal.registry.Registry;
+        import me.combimagnetron.passport.data.Identifier;
+
         import java.util.ArrayList;
         import java.util.List;
+        import java.util.Map;
         
         public interface Material {
+            Registry<Material> REGISTRY = Registry.empty();
         """;
     }
 
     private String footer() {
         return """
-                    static Material of(int material) {
-                        return new Impl(material);
-                    }
-                   \s
-                    record Impl(int material) implements Material {
-                       \s
-                    }
-        }
-        """;
+          \s
+           int material();
+          \s
+           Identifier identifier();
+          \s
+           static Material of(int id, Identifier identifier) {
+               Material material = new Impl(id, identifier);
+               REGISTRY.register(identifier, material);
+               return material;
+           }
+              \s
+           static Material material(Identifier identifier) {
+               return REGISTRY.get(identifier);
+           }
+                          \s
+           static Material direct(int id) {
+               return ((Registry.Impl<Material>) REGISTRY).registry().values().stream().filter(material -> material.material() == id).findFirst().orElseThrow();
+           }
+             \s
+           record Impl(int material, Identifier identifier) implements Material {
+                  \s
+           }
+       }
+       \s""";
     }
 
     private String content() {
         StringBuilder builder = new StringBuilder();
         for (JsonItem item : items) {
-            builder.append("    Material").append(" ").append(item.name().toUpperCase()).append(" = Material.of(").append(item.id).append(");\n");
+            builder.append("    Material").append(" ").append(item.name().toUpperCase()).append(" = Material.of(").append(item.id).append(", Identifier.of(\"minecraft\", \"").append(item.name).append("\"));\n");
         }
         return builder.toString();
     }

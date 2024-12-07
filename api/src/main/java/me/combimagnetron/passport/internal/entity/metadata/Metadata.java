@@ -1,8 +1,6 @@
 package me.combimagnetron.passport.internal.entity.metadata;
 
-import com.google.common.collect.ConcurrentHashMultiset;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;
-import me.combimagnetron.comet.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
 import me.combimagnetron.passport.internal.entity.metadata.type.Float;

@@ -6,36 +6,6 @@ public class ProtocolUtil {
     private static final int SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
 
-    public static int readVarInt(ByteBuffer input) {
-        int value = 0;
-        int length = 0;
-        byte currentByte;
-        do {
-            currentByte = input.get();
-            value |= (currentByte & 0x7F) << (length * 7);
-            length++;
-            if (length > 5) {
-                throw new RuntimeException("VarInt is too large. Must be smaller than 5 bytes.");
-            }
-        } while ((currentByte & 0x80) == 0x80);
-        return value;
-    }
-
-    public static void writeVarInt(ByteBuffer output, int value) {
-        if (value < 0 || value >= (1 << 21)) {
-            throw new IllegalArgumentException("Value out of range for 21-bit varint");
-        }
-        while (true) {
-            if ((value & 0xFFFFFF80) == 0) {
-                output.put((byte) value);
-                return;
-            }
-
-            output.put((byte) ((byte) value & 0x7F | 0x80));
-            value >>>= 7;
-        }
-    }
-
     public static long readVarLong(ByteBuffer input) {
         long value = 0;
         int position = 0;

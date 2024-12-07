@@ -1,0 +1,165 @@
+[
+    {
+        "id": "0x01",
+        "header": "Spawn Entity",
+        "packet": "spawn_entity",
+        "protocol_state": "play",
+        "bound_to": "client",
+        "content": [
+            {
+                "field": "entity_id",
+                "type": "var_int"
+            },
+            {
+                "field": "entity_uuid",
+                "type": "uuid"
+            },
+            {
+                "field": "type",
+                "type": "var_int"
+            },
+            {
+                "field": "x",
+                "type": "double"
+            },
+            {
+                "field": "y",
+                "type": "double"
+            },
+            {
+                "field": "z",
+                "type": "double"
+            },
+            {
+                "field": "pitch",
+                "type": "byte"
+            },
+            {
+                "field": "yaw",
+                "type": "byte"
+            },
+            {
+                "field": "head_yaw",
+                "type": "byte"
+            },
+            {
+                "field": "data",
+                "type": "var_int"
+            },
+            {
+                "field": "velocity_x",
+                "type": "short"
+            }
+        ]
+    },
+    {
+        "id": "0x58",
+        "header": "Set Entity Metadata",
+        "packet": "set_entity_metadata",
+        "protocol_state": "play",
+        "bound_to": "client",
+        "content": [
+            {
+                "field": "entity_id",
+                "type": "var_int"
+            },
+            {
+                "field": "metadata",
+                "type": "entity_metadata"
+            }
+        ]
+    },
+    {
+        "id": "0x64",
+        "header": "Update Time",
+        "packet": "update_time",
+        "protocol_state": "play",
+        "bound_to": "client",
+        "content": [
+            {
+                "field": "world_age",
+                "type": "long"
+            },
+            {
+                "field": "time_of_day",
+                "type": "long"
+            }
+        ]
+    },
+    {
+        "id": "0x0B",
+        "header": "Command Suggestions Request",
+        "packet": "command_suggestions_request",
+        "protocol_state": "play",
+        "bound_to": "server",
+        "content": [
+            {
+                "field": "transaction_id",
+                "type": "var_int"
+            },
+            {
+                "field": "text",
+                "type": "string"
+            }
+        ]
+    },
+    {
+        "id": "0x1B",
+        "header": "Set Player Position and Rotation",
+        "packet": "set_player_position_and_rotation",
+        "protocol_state": "play",
+        "bound_to": "server",
+        "content": [
+            {
+                "field": "x",
+                "type": "double"
+            },
+            {
+                "field": "feet_y",
+                "type": "double"
+            },
+            {
+                "field": "z",
+                "type": "double"
+            },
+            {
+                "field": "yaw",
+                "type": "float"
+            },
+            {
+                "field": "pitch",
+                "type": "float"
+            },
+            {
+                "field": "on_ground",
+                "type": "boolean"
+            }
+        ]
+    },
+    {
+        "id": "0x2F",
+        "header": "Set Held Item (serverbound)",
+        "packet": "set_held_item",
+        "protocol_state": "play",
+        "bound_to": "server",
+        "content": [
+            {
+                "field": "slot",
+                "type": "short"
+            }
+        ]
+    },
+    {
+        "id": "0x36",
+        "header": "Swing Arm",
+        "packet": "swing_arm",
+        "protocol_state": "play",
+        "bound_to": "server",
+        "content": [
+            {
+                "field": "hand",
+                "type": "var_int_enum"
+            }
+        ]
+    }
+]

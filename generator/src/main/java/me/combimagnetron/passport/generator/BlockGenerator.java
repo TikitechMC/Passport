@@ -12,15 +12,14 @@ import java.util.*;
 public class BlockGenerator {
     private final List<JsonBlock> items;
 
-    public BlockGenerator(File file) {
+    public BlockGenerator(File file, String version) {
         try {
             items = new Gson().fromJson(new FileReader(file), new TypeToken<ArrayList<JsonBlock>>() {}.getType());
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        //System.out.println(metadata() + header() + content() + "}");
         try {
-            Util.write("api/src/main/java/me/combimagnetron/generated/block/Block.java", metadata() + header() + content() + footer());
+            Util.write("api/src/main/java/me/combimagnetron/generated/R" + version.replaceAll("\\.", "_") + "/block/Block.java", metadata() + header(version) + content() + footer());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -194,9 +193,9 @@ public class BlockGenerator {
         """;
     }
 
-    private String header() {
-        return """
-        package me.combimagnetron.generated.block;
+    private String header(String version) {
+        String firstLine = "package me.combimagnetron.generated.R" + version.replaceAll("\\.", "_") + ".block;\n";
+        return firstLine + """
 
         import java.util.ArrayList;
         import java.util.List;
@@ -209,11 +208,11 @@ public class BlockGenerator {
     private String footer() {
         return """
                     static Block of(int id, String name, String displayName, double hardness, double resistance,
-                                    int stackSize, boolean diggable, String boundingBox, boolean transparent,
-                                    int emitLight, int filterLight, int defaultState, int minStateId, int maxStateId,
+                                    boolean diggable, String boundingBox, boolean transparent,
+                                    int defaultState, int minStateId, int maxStateId,
                                     Map<String, Boolean> harvestTools, List<Integer> drops, String type) {
-                        return new Impl(id, name, displayName, hardness, resistance, stackSize, diggable, transparent,
-                                        emitLight, filterLight, defaultState, minStateId, maxStateId, harvestTools, drops, boundingBox);
+                        return new Impl(id, name, displayName, hardness, resistance, diggable, transparent,
+                                        defaultState, minStateId, maxStateId, harvestTools, drops, boundingBox);
                     }
                 
                     final class Impl implements Block {
@@ -222,11 +221,8 @@ public class BlockGenerator {
                         private String displayName;
                         private double hardness;
                         private double resistance;
-                        private int stackSize;
                         private boolean diggable;
                         private boolean transparent;
-                        private int emitLight;
-                        private int filterLight;
                         private int defaultState;
                         private int minStateId;
                         private int maxStateId;
@@ -235,8 +231,8 @@ public class BlockGenerator {
                         private String boundingBox;
                 
                         Impl(int id, String name, String displayName, double hardness, double resistance,
-                                  int stackSize, boolean diggable, boolean transparent,
-                                  int emitLight, int filterLight, int defaultState, int minStateId, int maxStateId,
+                                  boolean diggable, boolean transparent,
+                                  int defaultState, int minStateId, int maxStateId,
                                   Map<String, Boolean> harvestTools, List<Integer> drops,
                                   String boundingBox) {
                             this.id = id;
@@ -244,11 +240,8 @@ public class BlockGenerator {
                             this.displayName = displayName;
                             this.hardness = hardness;
                             this.resistance = resistance;
-                            this.stackSize = stackSize;
                             this.diggable = diggable;
                             this.transparent = transparent;
-                            this.emitLight = emitLight;
-                            this.filterLight = filterLight;
                             this.defaultState = defaultState;
                             this.minStateId = minStateId;
                             this.maxStateId = maxStateId;
@@ -277,24 +270,12 @@ public class BlockGenerator {
                             return resistance;
                         }
                 
-                        public int stackSize() {
-                            return stackSize;
-                        }
-                
                         public boolean diggable() {
                             return diggable;
                         }
                 
                         public boolean transparent() {
                             return transparent;
-                        }
-                
-                        public int emitLight() {
-                            return emitLight;
-                        }
-                
-                        public int filterLight() {
-                            return filterLight;
                         }
                 
                         public int defaultState() {
@@ -329,9 +310,9 @@ public class BlockGenerator {
         StringBuilder builder = new StringBuilder();
         for (JsonBlock item : items) {
             builder.append("    Block").append(" ").append(item.name().toUpperCase()).append(" = Block.of(").append(item.id).append(", \"").append(item.name).append("\", \"").append(item.displayName)
-                    .append("\", ").append(item.hardness).append(", ").append(item.resistance).append(", ").append(item.stackSize)
+                    .append("\", ").append(item.hardness).append(", ").append(item.resistance)
                     .append(", ").append(item.diggable).append(", \"").append(item.material).append("\", ").append(item.transparent)
-                    .append(", ").append(item.emitLight).append(", ").append(item.filterLight).append(", ").append(item.defaultState)
+                    .append(", ").append(item.defaultState)
                     .append(", ").append(item.minStateId).append(", ").append(item.maxStateId)
                     .append(", ").append(adapt(item.harvestTools)).append(", ").append("List.of(").append(item.drops.toString().replace("[", "").replace("]", "")).append("), \"").append(item.boundingBox).append("\"").append(");\n");
 

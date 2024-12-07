@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="22">
+    <bytecodeTargetLevel target="23">
       <module name="api" target="22" />
       <module name="api.main" target="22" />
       <module name="api.test" target="22" />

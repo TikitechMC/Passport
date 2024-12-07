@@ -1,10 +1,18 @@
 package me.combimagnetron.passport.internal.network;
 
-import me.combimagnetron.passport.CometBase;
+import me.combimagnetron.generated.R1_21.item.Material;
+import me.combimagnetron.passport.Passport;
 import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.internal.entity.metadata.Metadata;
+import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
+import me.combimagnetron.passport.internal.item.Item;
+import me.combimagnetron.passport.internal.network.packet.Type;
 import me.combimagnetron.passport.user.User;
 import me.combimagnetron.passport.util.ProtocolUtil;
 import me.combimagnetron.passport.util.Values;
+import me.combimagnetron.passport.util.VarInt;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jglrxavpok.hephaistos.nbt.CompressedProcesser;
 import org.jglrxavpok.hephaistos.nbt.NBTException;
 import org.jglrxavpok.hephaistos.nbt.NBTReader;
@@ -13,11 +21,7 @@ import org.jglrxavpok.hephaistos.nbt.NBTWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -118,13 +122,13 @@ public class ByteBuffer {
 
     public interface Adapter<T> {
         Adapter<String> STRING = Impl.of(buffer -> {
-            int length = ProtocolUtil.readVarInt(buffer);
+            int length = VarInt.of(buffer).value();
             byte[] bytes = new byte[length];
             buffer.get(bytes);
             return new String(bytes);
         }, (buffer, string) -> {
             byte[] bytes = string.getBytes();
-            ProtocolUtil.writeVarInt(buffer, bytes.length);
+            VarInt.of(bytes.length).write(buffer);
             buffer.put(bytes);
         });
         Adapter<Byte[]> BYTE_ARRAY = Impl.of(input -> {
@@ -140,104 +144,29 @@ public class ByteBuffer {
                 output.get(aByte);
             }
         });
+        Adapter<Metadata> METADATA = Impl.of(input -> {
+            int length = VarInt.of(input).value();
+            byte[] bytes = new byte[length];
+            input.get(bytes);
+            return null;//Metadata.FACTORY.of(bytes);
+        }, (output, metadata) -> {
+            byte[] bytes = metadata.bytes().bytes();
+            VarInt.of(bytes.length).write(output);
+            output.put(bytes);
+        });
+        Adapter<Integer> UNSIGNED_BYTE = Impl.of(buffer -> buffer.get() & 0xFF, (buffer, integer) -> buffer.put((byte) (integer & 0xFF)));
         Adapter<Long> LONG = Impl.of(java.nio.ByteBuffer::getLong, java.nio.ByteBuffer::putLong);
         Adapter<Double> DOUBLE = Impl.of(java.nio.ByteBuffer::getDouble, java.nio.ByteBuffer::putDouble);
         Adapter<Float> FLOAT = Impl.of(java.nio.ByteBuffer::getFloat, java.nio.ByteBuffer::putFloat);
         Adapter<Integer> INT = Impl.of(java.nio.ByteBuffer::getInt, java.nio.ByteBuffer::putInt);
-        Adapter<User> USER = Impl.of(input -> CometBase.comet().users().deserialize(ByteBuffer.of(STRING.read(input).getBytes())), (output, user) -> output.put(user.serialize().bytes()));
+        Adapter<User<?>> USER = Impl.of(input -> Passport.passport().users().deserialize(ByteBuffer.of(STRING.read(input).getBytes())), (output, user) -> output.put(user.serialize().bytes()));
         Adapter<Identifier> IDENTIFIER = Impl.of(input -> {
             String[] parts = STRING.read(input).split(":");
             return Identifier.of(parts[0], parts[1]);
         }, (output, identifier) -> STRING.write(output, identifier.string()));
-        Adapter<Type<?>> TYPE = Impl.of(input -> {
-            Class<?> clazz;
-            try {
-                clazz = Class.forName(STRING.read(input));
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            int size = input.getInt();
-            byte[] bytes = new byte[size];
-            for (int i = 0; i < size; i++) {
-                bytes[i] = input.get();
-            }
-            try {
-                return (Type<?>) clazz.getDeclaredConstructor(byte[].class).newInstance(bytes);
-            } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
-                     IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }, (output, type) -> {
-            byte[] bytes = type.serialize();
-            STRING.write(output, type.type().getName());
-            output.put((byte) bytes.length);
-            output.put(bytes);
-        });
-        Adapter<Deployment> DEPLOYMENT = Impl.of(input -> {
-            String[] parts = STRING.read(input).split("%");
-            return Deployment.of(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
-        }, (output, deployment) -> STRING.write(output, deployment.name() + "%" + deployment.image() + "%" + deployment.minReplicas() + "%" + deployment.maxReplicas() + "%" + deployment.playerInstanceThreshold()));
-        Adapter<Version> VERSION = Impl.of(input -> {
-            String[] parts = STRING.read(input).split("\\.");
-            return Version.major(Integer.parseInt(parts[0])).minor(Integer.parseInt(parts[1])).patch(parts[2]);
-        }, (output, version) -> STRING.write(output, version.version()));
-        Adapter<Integer> UNSIGNED_BYTE = Impl.of(java.nio.ByteBuffer::getInt, java.nio.ByteBuffer::putInt);
-        Adapter<BrokerAgreement> BROKER_AGREEMENT = Impl.of(input -> {
-            BrokerAgreement agreement = BrokerAgreement.brokerAgreement();
-            int interceptSize = input.getInt();
-            for (int i = 0; i < interceptSize; i++) {
-                agreement.intercept(new BrokerAgreement.MessageReference.InterceptMessageReference<>(ServiceFile.find(STRING.read(input))));
-            }
-            int monitorSize = input.getInt();
-            for (int i = 0; i < monitorSize; i++) {
-                agreement.monitor(new BrokerAgreement.MessageReference.MonitorMessageReference<>(ServiceFile.find(STRING.read(input))));
-            }
-            return agreement;
-        }, (output, agreement) -> {
-            output.putInt(agreement.interceptSize());
-            for (BrokerAgreement.MessageReference.InterceptMessageReference<? extends Message> intercept : agreement.interceptMessages()) {
-                STRING.write(output ,intercept.message().getName());
-            }
-            output.putInt(agreement.monitorSize());
-            for (BrokerAgreement.MessageReference.MonitorMessageReference<? extends Message> monitor : agreement.monitorMessages()) {
-                STRING.write(output, monitor.message().getName());
-            }
-        });
         Adapter<Boolean> BOOLEAN = Impl.of(input -> input.get() == 1, (output, bool) -> output.put(bool ? (byte) 1 : (byte) 0));
         Adapter<Byte> BYTE = Impl.of(java.nio.ByteBuffer::get, java.nio.ByteBuffer::put);
         Adapter<Short> SHORT = Impl.of(java.nio.ByteBuffer::getShort, java.nio.ByteBuffer::putShort);
-        Adapter<DataObject<?>> DATA_OBJECT = Impl.of(input -> {
-            String identifier = STRING.read(input);
-            Adapter<?> adapter = Adapter.VALUES.values().stream().filter(a -> a.getClass().getTypeParameters()[0].getBounds()[0].getTypeName().equals(identifier)).findAny().orElseThrow();
-            return new DataObject<>(adapter, adapter.read(input));
-        }, (output, dataObject) -> {
-            STRING.write(output, dataObject.type().getClass().getTypeParameters()[0].getBounds()[0].getTypeName());
-            Adapter<Object> adapter = (Adapter<Object>)dataObject.type();
-            adapter.write(output, dataObject.value());
-        });
-        Adapter<UUID> UUID = Impl.of(input -> new UUID(input.getLong(), input.getLong()), (output, uuid) -> {
-            output.putLong(uuid.getMostSignificantBits());
-            output.putLong(uuid.getLeastSignificantBits());
-        });
-        Adapter<DataContainer> DATA_CONTAINER = Impl.of(input -> {
-            UserDataContainer container = new UserDataContainer();
-            java.util.UUID syncId = UUID.read(input);
-            int size = input.getInt();
-            for (int i = 0; i < size; i++) {
-                Identifier key = IDENTIFIER.read(input);
-                DataObject<?> dataObject = DATA_OBJECT.read(input);
-                container.add(key, dataObject);
-            }
-            container.syncId(syncId);
-            return container;
-        }, (output, container) -> {
-            UUID.write(output, container.syncId());
-            output.putInt(container.size());
-            for (Map.Entry<Identifier, DataObject<?>> key : container.values().entrySet()) {
-                IDENTIFIER.write(output, key.getKey());
-                DATA_OBJECT.write(output, key.getValue());
-            }
-        });
         Adapter<org.jglrxavpok.hephaistos.nbt.NBT> NBT = Impl.of(
             input -> {
                 NBTReader nbtReader = new NBTReader(new InputStream() {
@@ -264,19 +193,23 @@ public class ByteBuffer {
                         throw new RuntimeException(e);
                     }
             });
-        Adapter<Item<?>> ITEM = Impl.of(input -> {
+        Adapter<UUID> UUID = Impl.of(input -> new UUID(input.getLong(), input.getLong()), (output, uuid) -> {
+            output.putLong(uuid.getMostSignificantBits());
+            output.putLong(uuid.getLeastSignificantBits());
+        });
+        Adapter<Item> ITEM = Impl.of(input -> {
             if (!(input.get() == 0)) {
                 return Item.empty();
             }
-            int material = ProtocolUtil.readVarInt(input);
+            int material = VarInt.of(input).value();
             int amount = input.get();
-            return Item.item(material, amount);
+            return Item.item(Material.direct(material), amount);
         }, ((output, item) -> {
             output.put(item != null ? (byte) 1 : (byte) 0);
             if (item == null) {
                 return;
             }
-            ProtocolUtil.writeVarInt(output, (int) item.material());
+            VarInt.of(item.material().material()).write(output);
             output.put((byte) item.amount());
             if (item.nbt().isEmpty()) {
                 output.put((byte) 0);
@@ -286,9 +219,93 @@ public class ByteBuffer {
             byteBuffer.write(NBT, item.nbt());
             output.put(byteBuffer.bytes());
         }));
-        Adapter<Integer> VAR_INT = Impl.of(ProtocolUtil::readVarInt, ProtocolUtil::writeVarInt);
+        Adapter<Enum> ENUM = Impl.of(input -> {
+            int ordinal = VarInt.of(input).value();
+            return null;
+        }, (output, anEnum) -> {
+            VarInt.of(anEnum.ordinal()).write(output);
+        });
+        Adapter<Integer> UNSIGNED_SHORT = Impl.of(buffer -> buffer.getShort() & 0xFFFF, (buffer, integer) -> buffer.putShort((short) (integer & 0xFFFF)));
+        Adapter<Optional<Integer>> OPTIONAL_VAR_INT = Impl.of(input -> {
+            if (input.get() == 0) {
+                return Optional.empty();
+            }
+            return Optional.of(VarInt.of(input).value());
+        }, (output, optionalInt) -> {
+            if (optionalInt.isEmpty()) {
+                output.put((byte) 0);
+                return;
+            }
+            output.put((byte) 1);
+            VarInt.of(optionalInt.get()).write(output);
+        });
+        Adapter<Optional<String>> OPTIONAL_STRING = Impl.of(input -> {
+            if (input.get() == 0) {
+                return Optional.empty();
+            }
+            return Optional.of(STRING.read(input));
+        }, (output, optionalString) -> {
+            if (optionalString.isEmpty()) {
+                output.put((byte) 0);
+                return;
+            }
+            output.put((byte) 1);
+            STRING.write(output, optionalString.get());
+        });
+        Adapter<Vector3d> BLOCK_POSITION = Impl.of(input -> {
+            final long value = input.getLong();
+            final int x = (int) (value >> 38);
+            final int y = (int) (value << 52 >> 52);
+            final int z = (int) (value << 26 >> 38);
+            return Vector3d.vec3(x, y, z);
+        }, (output, vector3d) -> {
+            final int blockX = (int) vector3d.x();
+            final int blockY = (int) vector3d.y();
+            final int blockZ = (int) vector3d.z();
+            final long longPos = (((long) blockX & 0x3FFFFFF) << 38) |
+                    (((long) blockZ & 0x3FFFFFF) << 12) |
+                    ((long) blockY & 0xFFF);
+            output.putLong(longPos);
+        });
+        Adapter<Optional<UUID>> OPTIONAL_UUID = Impl.of(input -> {
+            if (input.get() == 0) {
+                return Optional.empty();
+            }
+            return Optional.of(UUID.read(input));
+        }, (output, optionalUUID) -> {
+            if (optionalUUID.isEmpty()) {
+                output.put((byte) 0);
+                return;
+            }
+            output.put((byte) 1);
+            UUID.write(output, optionalUUID.get());
+        });
+        Adapter<Type> TYPE = Impl.of(input -> {
+            final String typeName = STRING.read(input);
+            final Type type = null;//Type.find(typeName);
+            if (type == null) {
+                throw new IllegalArgumentException("Unknown type: " + typeName);
+            }
+            return type;
+        }, (output, type) -> {
+            BYTE_ARRAY.write(output, type.write());
+        });
+        Adapter<Optional<Component>> OPTIONAL_COMPONENT = Impl.of(input -> {
+            if (input.get() == 0) {
+                return Optional.empty();
+            }
+            return Optional.of(GsonComponentSerializer.gson().deserialize(STRING.read(input)));
+        }, (output, optionalComponent) -> {
+            if (optionalComponent.isEmpty()) {
+                output.put((byte) 0);
+                return;
+            }
+            output.put((byte) 1);
+            STRING.write(output, GsonComponentSerializer.gson().serialize(optionalComponent.get()));
+        });
+        Adapter<Integer> VAR_INT = Impl.of(input -> VarInt.of(input).value(), (output, i) -> VarInt.of(i).write(output));
         Adapter<Long> VAR_LONG = Impl.of(ProtocolUtil::readVarLong, ProtocolUtil::writeVarLong);
-        Values<Adapter<?>> VALUES = Values.of(STRING, TYPE, LONG, DOUBLE, FLOAT, INT, IDENTIFIER, DEPLOYMENT, UNSIGNED_BYTE, BOOLEAN, BYTE, SHORT, DATA_OBJECT, UUID, NBT, ITEM, VAR_INT, VAR_LONG);
+        Values<Adapter<?>> VALUES = Values.of(STRING, METADATA, LONG, DOUBLE, USER, FLOAT, INT, IDENTIFIER, BOOLEAN, BYTE, SHORT, UUID, NBT, ITEM, VAR_INT, VAR_LONG);
         T read(java.nio.ByteBuffer byteArrayDataInput);
         void write(java.nio.ByteBuffer output, T object);
         final class Impl<V> implements Adapter<V> {

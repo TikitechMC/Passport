@@ -1,6 +1,6 @@
 package me.combimagnetron.passport.internal.entity;
 
-import me.combimagnetron.comet.user.User;
+import me.combimagnetron.passport.user.User;
 
 import java.util.Collection;
 

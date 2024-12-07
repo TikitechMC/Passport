@@ -1,15 +1,13 @@
 package me.combimagnetron.passport.internal.entity.impl.display;
 
-import me.combimagnetron.comet.data.Identifier;
+import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
-import me.combimagnetron.comet.internal.entity.metadata.type.*;
+import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
 import me.combimagnetron.passport.internal.entity.metadata.type.Chat;
 import me.combimagnetron.passport.internal.entity.metadata.type.VarInt;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
-import me.combimagnetron.passport.internal.network.packet.client.ClientEntityMetadata;
-import me.combimagnetron.passport.internal.network.packet.client.ClientSpawnEntity;
-import me.combimagnetron.comet.user.User;
+import me.combimagnetron.passport.user.User;
 import net.kyori.adventure.text.Component;
 
 import java.util.function.Consumer;
@@ -159,8 +157,8 @@ public class TextDisplay extends Display {
             super(position, display -> {
             });
             this.viewer = viewer;
-            viewer.connection().send(ClientSpawnEntity.spawnEntity(this));
-            viewer.connection().send(ClientEntityMetadata.entityMetadata(this));
+            //viewer.connection().send(ClientSpawnEntity.spawnEntity(this));
+            //viewer.connection().send(ClientEntityMetadata.entityMetadata(this));
         }
 
         @Override
@@ -170,7 +168,7 @@ public class TextDisplay extends Display {
         }
 
         private void update() {
-            viewer.connection().send(ClientEntityMetadata.entityMetadata(this));
+            //viewer.connection().send(ClientEntityMetadata.entityMetadata(this));
         }
 
 

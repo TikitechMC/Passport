@@ -1,9 +1,7 @@
 package me.combimagnetron.passport.internal.entity;
 
-import me.combimagnetron.comet.event.EventBus;
-import me.combimagnetron.comet.event.EventFilter;
-import me.combimagnetron.comet.event.EventSubscription;
-import me.combimagnetron.comet.event.impl.connection.UserJoinEvent;
+import me.combimagnetron.passport.event.EventBus;
+import me.combimagnetron.passport.event.impl.connection.UserJoinEvent;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
 
 import java.util.HashMap;
