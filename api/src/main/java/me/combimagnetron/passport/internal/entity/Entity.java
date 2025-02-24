@@ -5,6 +5,7 @@ import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
+import me.combimagnetron.passport.util.Pair;
 import net.kyori.adventure.text.Component;
 
 import java.util.Collection;
@@ -206,6 +207,10 @@ public interface Entity {
             return rotation;
         }
 
+        public void rotation(Vector3d rotation) {
+            this.rotation = rotation;
+        }
+
         @Override
         public Vector3d velocity() {
             return velocity;
@@ -236,24 +241,24 @@ public interface Entity {
 
         void prepare() {
             this.metadata = template.apply(
-                    Byte.of((byte)0),
-                    VarInt.of(air),
-                    OptChat.of(name),
-                    Boolean.of(nameVisible),
-                    Boolean.of(silent),
-                    Boolean.of(noGravity),
-                    pose,
-                    VarInt.of(frozenPowderedSnow)
+                    Pair.of(0 ,Byte.of((byte)0)),
+                    Pair.of(1 ,VarInt.of(air)),
+                    Pair.of(2 ,OptChat.of(name)),
+                    Pair.of(3 ,Boolean.of(nameVisible)),
+                    Pair.of(4 ,Boolean.of(silent)),
+                    Pair.of(5 ,Boolean.of(noGravity)),
+                    Pair.of(6 ,pose),
+                    Pair.of(7 ,VarInt.of(frozenPowderedSnow))
             );
         }
 
     }
 
     record EntityId(int intValue) {
-        private static final AtomicInteger INTEGER = new AtomicInteger(0);
+        private static final AtomicInteger INTEGER = new AtomicInteger(Integer.MAX_VALUE);
 
         public static EntityId next() {
-            return new EntityId(INTEGER.getAndIncrement());
+            return new EntityId(INTEGER.getAndDecrement());
         }
 
         public static EntityId of(int id) {

@@ -5,6 +5,7 @@ import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
 import me.combimagnetron.passport.internal.entity.metadata.type.Float;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
+import me.combimagnetron.passport.util.Pair;
 
 public class Interaction extends Entity.AbstractEntity {
     private float width;
@@ -43,9 +44,9 @@ public class Interaction extends Entity.AbstractEntity {
     @Override
     public Metadata extend() {
         return Metadata.of(
-                Float.of(width),
-                Float.of(height),
-                Boolean.of(responsive)
+                Pair.of(8, Float.of(width)),
+                Pair.of(9, Float.of(height)),
+                Pair.of(10, Boolean.of(responsive))
         );
     }
 }

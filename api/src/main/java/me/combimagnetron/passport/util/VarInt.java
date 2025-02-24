@@ -37,18 +37,23 @@ public class VarInt {
     }
 
     public void write(ByteBuffer output) {
-        int value = this.value;
-        if (value < 0 || value >= (1 << 21)) {
-            throw new IllegalArgumentException("Value out of range for 21-bit varint");
-        }
-        while (true) {
-            if ((value & 0xFFFFFF80) == 0) {
-                output.put((byte) value);
-                return;
-            }
-
-            output.put((byte) ((byte) value & 0x7F | 0x80));
-            value >>>= 7;
+        if ((value & (0xFFFFFFFF << 7)) == 0) {
+            output.put((byte) value);
+        } else if ((value & (0xFFFFFFFF << 14)) == 0) {
+            int w = (value & 0x7F | 0x80) << 8 | (value >>> 7);
+            output.putShort((short) w);
+        } else if ((value & (0xFFFFFFFF << 21)) == 0) {
+            int w = (value & 0x7F | 0x80) << 16 | ((value >>> 7) & 0x7F | 0x80) << 8 | (value >>> 14);
+            me.combimagnetron.passport.internal.network.ByteBuffer.Adapter.MEDIUM.write(output, w);
+        } else if ((value & (0xFFFFFFFF << 28)) == 0) {
+            int w = (value & 0x7F | 0x80) << 24 | (((value >>> 7) & 0x7F | 0x80) << 16)
+                    | ((value >>> 14) & 0x7F | 0x80) << 8 | (value >>> 21);
+            output.putInt(w);
+        } else {
+            int w = (value & 0x7F | 0x80) << 24 | ((value >>> 7) & 0x7F | 0x80) << 16
+                    | ((value >>> 14) & 0x7F | 0x80) << 8 | ((value >>> 21) & 0x7F | 0x80);
+            output.putInt(w);
+            output.put((byte) ((byte) value >>> 28));
         }
     }
 

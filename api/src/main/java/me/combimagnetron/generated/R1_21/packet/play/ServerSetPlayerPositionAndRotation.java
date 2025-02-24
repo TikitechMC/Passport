@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ServerSetPlayerPositionAndRotation implements me.combimagnetron.passport.internal.network.packet.ServerPacket {
+    private final static int ID = 0x1B;
     private final ByteBuffer byteBuffer;
     private final double x;
     private final double feet_y;
@@ -73,6 +74,7 @@ public class ServerSetPlayerPositionAndRotation implements me.combimagnetron.pas
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.DOUBLE, x);
         byteBuffer.write(ByteBuffer.Adapter.DOUBLE, feet_y);
         byteBuffer.write(ByteBuffer.Adapter.DOUBLE, z);

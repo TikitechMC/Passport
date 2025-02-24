@@ -1,6 +1,7 @@
 package me.combimagnetron.passport.internal.network;
 
-import me.combimagnetron.generated.R1_21.item.Material;
+//import me.combimagnetron.generated.R1_21.item.Material;
+//import me.combimagnetron.generated.R1_21.item.Material;
 import me.combimagnetron.passport.Passport;
 import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
@@ -38,7 +39,7 @@ public class ByteBuffer {
         this.buffer = java.nio.ByteBuffer.wrap(bytes);
     }
     private ByteBuffer() {
-        this.buffer = java.nio.ByteBuffer.allocate(700000);
+        this.buffer = java.nio.ByteBuffer.allocate(7000000);
     }
     public <T> ByteBuffer write(Adapter<T> type, T object) {
         type.write(buffer, object);
@@ -197,27 +198,41 @@ public class ByteBuffer {
             output.putLong(uuid.getMostSignificantBits());
             output.putLong(uuid.getLeastSignificantBits());
         });
+        Adapter<Integer> MEDIUM = Impl.of(buffer -> {
+            int value = buffer.get() << 16;
+            value |= buffer.get() << 8;
+            value |= buffer.get();
+            return value;
+        }, (buffer, value) -> {
+            if (value < -8388608 || value > 8388607) {
+                throw new IllegalArgumentException("Value out of range for 24-bit signed integer: " + value);
+            }
+            buffer.put((byte) ((value >> 16) & 0xFF));
+            buffer.put((byte) ((value >> 8) & 0xFF));
+            buffer.put((byte) (value & 0xFF));
+        });
         Adapter<Item> ITEM = Impl.of(input -> {
             if (!(input.get() == 0)) {
-                return Item.empty();
+                //return Item.empty();
             }
             int material = VarInt.of(input).value();
             int amount = input.get();
-            return Item.item(Material.direct(material), amount);
+            return null;
+            //return Item.item(Material.direct(material), amount);
         }, ((output, item) -> {
             output.put(item != null ? (byte) 1 : (byte) 0);
             if (item == null) {
                 return;
             }
-            VarInt.of(item.material().material()).write(output);
-            output.put((byte) item.amount());
+            //VarInt.of(item.material().material()).write(output);
+            /*(output.put((byte) item.amount());
             if (item.nbt().isEmpty()) {
                 output.put((byte) 0);
                 return;
             }
             ByteBuffer byteBuffer = ByteBuffer.empty();
             byteBuffer.write(NBT, item.nbt());
-            output.put(byteBuffer.bytes());
+            output.put(byteBuffer.bytes());*/
         }));
         Adapter<Enum> ENUM = Impl.of(input -> {
             int ordinal = VarInt.of(input).value();

@@ -7,18 +7,18 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserHandler<T extends Audience> {
+public interface UserHandler<V extends Audience, U extends User<V>> {
 
-    User<T> user(T t);
+    U user(V t);
 
-    Optional<User<T>> user(UUID uuid);
+    Optional<U> user(UUID uuid);
 
-    Optional<User<T>> user(String name);
+    Optional<U> user(String name);
 
-    Collection<User<T>> users();
+    Collection<U> users();
 
-    Collection<User<T>> global();
+    Collection<U> global();
 
-    User<T> deserialize(ByteBuffer buffer);
+    U deserialize(ByteBuffer buffer);
 
 }

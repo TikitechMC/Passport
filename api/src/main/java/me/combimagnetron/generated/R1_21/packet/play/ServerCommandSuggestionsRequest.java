@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ServerCommandSuggestionsRequest implements me.combimagnetron.passport.internal.network.packet.ServerPacket {
+    private final static int ID = 0x0B;
     private final ByteBuffer byteBuffer;
     private final Integer transaction_id;
     private final String text;
@@ -47,6 +48,7 @@ public class ServerCommandSuggestionsRequest implements me.combimagnetron.passpo
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.VAR_INT, transaction_id);
         byteBuffer.write(ByteBuffer.Adapter.STRING, text);
         return byteBuffer.bytes();

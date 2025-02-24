@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ClientSetEntityMetadata implements me.combimagnetron.passport.internal.network.packet.ClientPacket {
+    private final static int ID = 0x58;
     private final ByteBuffer byteBuffer;
     private final Integer entity_id;
     private final Metadata metadata;
@@ -47,6 +48,7 @@ public class ClientSetEntityMetadata implements me.combimagnetron.passport.inter
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.VAR_INT, entity_id);
         byteBuffer.write(ByteBuffer.Adapter.METADATA, metadata);
         return byteBuffer.bytes();

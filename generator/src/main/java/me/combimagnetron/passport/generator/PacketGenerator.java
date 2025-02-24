@@ -49,6 +49,7 @@ public class PacketGenerator {
     private String content(JsonPacket item) {
         final String name = Util.capitalizeFirstLetter(item.boundTo()) + Util.snakeToUpperCamel(item.packet());
         StringBuilder builder = new StringBuilder();
+        builder.append("    private final static int ID = ").append(item.id()).append(";\n");
         builder.append("    private final ByteBuffer byteBuffer;\n");
         for (PacketField field : item.content()) {
             builder.append("    private final ").append(TypeAdapter.find(field.type()).clazz()).append(" ").append(field.field()).append(";\n");
@@ -117,6 +118,7 @@ public class PacketGenerator {
         builder.append("\n");
         builder.append("    @Override\n");
         builder.append("    public byte[] write() {\n");
+        builder.append("        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);\n");
         for (PacketField field : item.content()) {
             builder.append("        byteBuffer.write(ByteBuffer.Adapter.").append(TypeAdapter.find(field.type()).byteBuffer()).append(", ").append(field.field()).append(");\n");
         }

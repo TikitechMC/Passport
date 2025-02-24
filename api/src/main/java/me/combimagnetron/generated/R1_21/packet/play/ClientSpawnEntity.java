@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ClientSpawnEntity implements me.combimagnetron.passport.internal.network.packet.ClientPacket {
+    private final static int ID = 0x01;
     private final ByteBuffer byteBuffer;
     private final Integer entity_id;
     private final UUID entity_uuid;
@@ -112,6 +113,7 @@ public class ClientSpawnEntity implements me.combimagnetron.passport.internal.ne
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.VAR_INT, entity_id);
         byteBuffer.write(ByteBuffer.Adapter.UUID, entity_uuid);
         byteBuffer.write(ByteBuffer.Adapter.VAR_INT, type);

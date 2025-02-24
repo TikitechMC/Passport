@@ -1,5 +1,6 @@
 package me.combimagnetron.passport;
 
+import me.combimagnetron.passport.user.User;
 import me.combimagnetron.passport.user.UserHandler;
 import net.kyori.adventure.audience.Audience;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ public interface Passport<T> {
         return (Passport<T>) Holder.INSTANCE;
     }
 
-    UserHandler<? extends Audience> users();
+    UserHandler<? extends Audience, ? extends User<? extends Audience>> users();
 
     Path dataFolder();
 

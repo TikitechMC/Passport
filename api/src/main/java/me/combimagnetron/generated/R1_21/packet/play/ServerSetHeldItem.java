@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ServerSetHeldItem implements me.combimagnetron.passport.internal.network.packet.ServerPacket {
+    private final static int ID = 0x2F;
     private final ByteBuffer byteBuffer;
     private final short slot;
 
@@ -38,6 +39,7 @@ public class ServerSetHeldItem implements me.combimagnetron.passport.internal.ne
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.SHORT, slot);
         return byteBuffer.bytes();
     }

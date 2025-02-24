@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ClientUpdateTime implements me.combimagnetron.passport.internal.network.packet.ClientPacket {
+    private final static int ID = 0x64;
     private final ByteBuffer byteBuffer;
     private final long world_age;
     private final long time_of_day;
@@ -45,6 +46,7 @@ public class ClientUpdateTime implements me.combimagnetron.passport.internal.net
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.LONG, world_age);
         byteBuffer.write(ByteBuffer.Adapter.LONG, time_of_day);
         return byteBuffer.bytes();

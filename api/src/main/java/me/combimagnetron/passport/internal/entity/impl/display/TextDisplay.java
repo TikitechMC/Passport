@@ -1,13 +1,14 @@
 package me.combimagnetron.passport.internal.entity.impl.display;
 
+//import me.combimagnetron.generated.R1_21.packet.play.ClientSpawnEntity;
 import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
-import me.combimagnetron.passport.internal.entity.metadata.type.*;
-import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
+        import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
 import me.combimagnetron.passport.internal.entity.metadata.type.Chat;
 import me.combimagnetron.passport.internal.entity.metadata.type.VarInt;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
 import me.combimagnetron.passport.user.User;
+import me.combimagnetron.passport.util.Pair;
 import net.kyori.adventure.text.Component;
 
 import java.util.function.Consumer;
@@ -15,7 +16,7 @@ import java.util.function.Consumer;
 @SuppressWarnings(value = "unused")
 public class TextDisplay extends Display {
     private Component text = Component.empty();
-    private int lineWidth = Integer.MAX_VALUE;
+    private int lineWidth = 200;
     private int backgroundColor = 0x40000000;
     private byte textOpacity = -1;
     private Options options = Options.options();
@@ -78,7 +79,7 @@ public class TextDisplay extends Display {
 
     @Override
     public Type type() {
-        return new Type.Impl(100, Identifier.of("minecraft", "text_display"), this.extend());
+        return new Type.Impl(124, Identifier.of("minecraft", "text_display"), this.extend());
     }
 
     public static class Options {
@@ -142,11 +143,11 @@ public class TextDisplay extends Display {
     public Metadata extend() {
         return Metadata.inheritAndMerge(
                 base(),
-                Chat.of(text),
-                VarInt.of(lineWidth),
-                VarInt.of(backgroundColor),
-                Byte.of(textOpacity),
-                Byte.of((byte) 0)
+                Pair.of(23, Chat.of(text)),
+                Pair.of(24, VarInt.of(lineWidth)),
+                Pair.of(25, VarInt.of(backgroundColor)),
+                Pair.of(26, Byte.of(textOpacity)),
+                Pair.of(27, Byte.of((byte) 0))
         );
     }
 
@@ -157,8 +158,6 @@ public class TextDisplay extends Display {
             super(position, display -> {
             });
             this.viewer = viewer;
-            //viewer.connection().send(ClientSpawnEntity.spawnEntity(this));
-            //viewer.connection().send(ClientEntityMetadata.entityMetadata(this));
         }
 
         @Override

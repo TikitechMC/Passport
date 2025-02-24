@@ -7,6 +7,7 @@ import me.combimagnetron.passport.internal.entity.metadata.type.Quaternion;
 import me.combimagnetron.passport.internal.entity.metadata.type.VarInt;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
+import me.combimagnetron.passport.util.Pair;
 
 import java.util.function.Consumer;
 
@@ -85,21 +86,21 @@ public class Display extends Entity.AbstractEntity {
 
     public Metadata base() {
         return Metadata.of(
-                VarInt.of(interpolationDelay()),
-                VarInt.of(0),
-                VarInt.of(0),
-                transformation().translation(),
-                transformation().scale(),
-                transformation().rotationLeft(),
-                transformation().rotationRight(),
-                Byte.of(billboard().constraint()),
-                VarInt.of(brightness()),
-                Float.of(viewRange()),
-                Float.of(shadow().radius()),
-                Float.of(shadow().strength()),
-                Float.of(width()),
-                Float.of(height()),
-                VarInt.of(glowOverride())
+                Pair.of(8, VarInt.of(interpolationDelay())),
+                Pair.of(9, VarInt.of(0)),
+                Pair.of(10, VarInt.of(0)),
+                Pair.of(11, transformation().translation()),
+                Pair.of(12, transformation().scale()),
+                Pair.of(13, transformation().rotationLeft()),
+                Pair.of(14, transformation().rotationRight()),
+                Pair.of(15, Byte.of(billboard().constraint())),
+                Pair.of(16, VarInt.of(brightness())),
+                Pair.of(17, Float.of(viewRange())),
+                Pair.of(18, Float.of(shadow().radius())),
+                Pair.of(19, Float.of(shadow().strength())),
+                Pair.of(20, Float.of(width())),
+                Pair.of(21, Float.of(height())),
+                Pair.of(22, VarInt.of(glowOverride()))
         );
     }
 
@@ -142,7 +143,7 @@ public class Display extends Entity.AbstractEntity {
     }
 
     public void transformation(Transformation transformation) {
-        //this.transformation = transformation;
+        this.transformation = transformation;
     }
 
     public Billboard billboard() {

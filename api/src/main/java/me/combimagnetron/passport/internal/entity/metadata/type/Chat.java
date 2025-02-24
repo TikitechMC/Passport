@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public record Chat(@NonNull Component component) implements MetadataType {
+public record Chat(@NonNull Component component) implements MetadataType<Component> {
 
     public static Chat of(Component component) {
         return new Chat(component);
@@ -14,7 +14,12 @@ public record Chat(@NonNull Component component) implements MetadataType {
     @Override
     public byte[] bytes() {
         final ByteBuffer buffer = ByteBuffer.empty();
-        buffer.write(ByteBuffer.Adapter.STRING, GsonComponentSerializer.gson().serialize(component));
+        //buffer.write(ByteBuffer.Adapter.STRING, GsonComponentSerializer.gson().serialize(component));
         return buffer.bytes();
+    }
+
+    @Override
+    public Component object() {
+        return component;
     }
 }

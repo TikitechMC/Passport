@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
  
 public class ServerSwingArm implements me.combimagnetron.passport.internal.network.packet.ServerPacket {
+    private final static int ID = 0x36;
     private final ByteBuffer byteBuffer;
     private final Enum hand;
 
@@ -39,6 +40,7 @@ public class ServerSwingArm implements me.combimagnetron.passport.internal.netwo
 
     @Override
     public byte[] write() {
+        byteBuffer.write(ByteBuffer.Adapter.VAR_INT, ID);
         byteBuffer.write(ByteBuffer.Adapter.ENUM, hand);
         return byteBuffer.bytes();
     }

@@ -1,8 +1,9 @@
 package me.combimagnetron.passport.internal.entity.metadata.type;
 
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 
-public record Pose(Value value) implements MetadataType {
+public record Pose(Value value) implements MetadataType<EntityPose> {
 
     public static Pose of(Value value) {
         return new Pose(value);
@@ -15,7 +16,12 @@ public record Pose(Value value) implements MetadataType {
     @Override
     public byte[] bytes() {
         final ByteBuffer buffer = ByteBuffer.empty();
-        buffer.write(ByteBuffer.Adapter.VAR_INT, value.ordinal());
+        //buffer.write(ByteBuffer.Adapter.VAR_INT, value.ordinal());
         return buffer.bytes();
+    }
+
+    @Override
+    public EntityPose object() {
+        return EntityPose.valueOf(value.name());
     }
 }

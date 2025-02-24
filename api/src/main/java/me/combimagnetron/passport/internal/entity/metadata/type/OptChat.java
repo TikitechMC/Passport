@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record OptChat(@Nullable Component component) implements MetadataType {
+public record OptChat(@Nullable Component component) implements MetadataType<Component> {
 
     public static OptChat of(@Nullable Component component) {
         return new OptChat(component);
@@ -20,5 +20,10 @@ public record OptChat(@Nullable Component component) implements MetadataType {
             buffer.write(ByteBuffer.Adapter.STRING ,GsonComponentSerializer.gson().serialize(component));
         }
         return buffer.bytes();
+    }
+
+    @Override
+    public @Nullable Component object() {
+        return component;
     }
 }

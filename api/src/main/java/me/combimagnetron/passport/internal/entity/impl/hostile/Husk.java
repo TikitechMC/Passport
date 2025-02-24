@@ -1,5 +1,6 @@
 package me.combimagnetron.passport.internal.entity.impl.hostile;
 
+import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.Entity;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
@@ -21,7 +22,7 @@ public class Husk extends Entity.AbstractEntity {
 
     @Override
     public Type type() {
-        return null;
+        return new Type.Impl(54, Identifier.split("minecraft:husk"), Metadata.of());
     }
 
     @Override
