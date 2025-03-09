@@ -16,11 +16,24 @@ dependencies {
     implementation(project(":R1_21"))
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(23))
+}
+
 tasks {
     build {
         dependsOn(":api:build")
         dependsOn(":R1_21:build")
         dependsOn("shadowJar")
+    }
+
+    shadowJar {
+        configurations = listOf(project.configurations.runtimeClasspath.get())
+        dependencies {
+            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:.*"))
+            exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:.*"))
+            exclude(dependency("com.google.guava:guava:.*"))
+        }
     }
 }
 

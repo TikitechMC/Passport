@@ -2,10 +2,9 @@ package me.combimagnetron.passport.internal.entity.metadata.type;
 
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-public record Chat(@NonNull Component component) implements MetadataType<Component> {
+public record Chat(@NotNull Component component) implements MetadataType<Component> {
 
     public static Chat of(Component component) {
         return new Chat(component);

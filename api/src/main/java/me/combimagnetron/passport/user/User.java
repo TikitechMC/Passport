@@ -32,6 +32,8 @@ public interface User<T extends Audience> {
 
      Vector3d rotation();
 
+     int gameMode();
+
      /*
      1. UUID -> Unique Identifier
      2. String -> Name

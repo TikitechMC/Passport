@@ -1,9 +1,8 @@
 package me.combimagnetron.passport.internal.entity.impl.display;
 
-//import me.combimagnetron.generated.R1_21.packet.play.ClientSpawnEntity;
 import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
-        import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
+import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
 import me.combimagnetron.passport.internal.entity.metadata.type.Chat;
 import me.combimagnetron.passport.internal.entity.metadata.type.VarInt;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;

@@ -3,7 +3,7 @@ package me.combimagnetron.passport.internal.entity.metadata.type;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public record OptChat(@Nullable Component component) implements MetadataType<Component> {
 

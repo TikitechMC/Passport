@@ -16,13 +16,15 @@ repositories {
 val kotlinVersion = "1.7.22"
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    implementation("com.google.guava:guava:33.3.0-jre")
-    implementation("com.typesafe:config:1.4.2")
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = kotlinVersion)
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = kotlinVersion)
+    compileOnly("com.google.guava:guava:33.3.0-jre")
+    compileOnly("com.typesafe:config:1.4.2")
+    compileOnly(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = kotlinVersion)
+    compileOnly(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = kotlinVersion)
     compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 publishing {

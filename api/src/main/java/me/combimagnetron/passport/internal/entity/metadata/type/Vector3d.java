@@ -22,6 +22,42 @@ public record Vector3d(double x, double y, double z) implements MetadataType<Vec
         return buffer.bytes();
     }
 
+    public Vector3d add(Vector3d other) {
+        return new Vector3d(x + other.x, y + other.y, z + other.z);
+    }
+
+    public Vector3d sub(Vector3d other) {
+        return new Vector3d(x - other.x, y - other.y, z - other.z);
+    }
+
+    public Vector3d mul(Vector3d other) {
+        return new Vector3d(x * other.x, y * other.y, z * other.z);
+    }
+
+    public Vector3d div(Vector3d other) {
+        return new Vector3d(x / other.x, y / other.y, z / other.z);
+    }
+
+    public Vector3d add(double other) {
+        return new Vector3d(x + other, y + other, z + other);
+    }
+
+    public Vector3d sub(double other) {
+        return new Vector3d(x - other, y - other, z - other);
+    }
+
+    public Vector3d mul(double other) {
+        return new Vector3d(x * other, y * other, z * other);
+    }
+
+    public Vector3d div(double other) {
+        return new Vector3d(x / other, y / other, z / other);
+    }
+
+    public Vector3d abs() {
+        return new Vector3d(Math.abs(x), Math.abs(y), Math.abs(z));
+    }
+
     @Override
     public Vector3f object() {
         return new Vector3f((float) x, (float) y, (float) z);

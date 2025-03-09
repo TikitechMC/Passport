@@ -19,6 +19,8 @@ public sealed interface Dispatcher<T extends Event> permits Dispatcher.SimpleDis
 
     void post(Class<T> type, T event);
 
+    void post(T event);
+
     EventSubscriptionManager<? extends EventSubscription<T>> manager();
 
     final class SimpleDispatcher<T extends Event> implements Dispatcher<T> {
@@ -37,6 +39,11 @@ public sealed interface Dispatcher<T extends Event> permits Dispatcher.SimpleDis
         @Override
         public void post(Class<T> type, T event) {
             subscriptionManager.subscriptionMap().values().stream().filter(e -> e.getEventClass() == type).forEach(e -> e.handler().accept(event));
+        }
+
+        @Override
+        public void post(T event) {
+            post((Class<T>) event.getClass(), event);
         }
 
         @Override

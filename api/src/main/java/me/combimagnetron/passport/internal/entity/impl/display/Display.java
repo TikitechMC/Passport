@@ -1,5 +1,7 @@
 package me.combimagnetron.passport.internal.entity.impl.display;
 
+import me.combimagnetron.passport.event.Dispatcher;
+import me.combimagnetron.passport.event.impl.connection.UserJoinEvent;
 import me.combimagnetron.passport.internal.entity.Entity;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Float;
@@ -158,8 +160,8 @@ public class Display extends Entity.AbstractEntity {
         return brightness;
     }
 
-    public void brightness(int brightness) {
-        this.brightness = brightness;
+    public void brightness(int blockLight, int skyLight) {
+        this.brightness = blockLight << 4 | skyLight << 20;
     }
 
     public float viewRange() {

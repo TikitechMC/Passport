@@ -13,6 +13,10 @@ repositories {
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 dependencies {
     compileOnly("com.github.retrooper:packetevents-spigot:2.7.1-SNAPSHOT")
     implementation(project(":api"))

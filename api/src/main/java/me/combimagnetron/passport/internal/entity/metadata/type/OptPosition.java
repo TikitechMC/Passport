@@ -2,7 +2,7 @@ package me.combimagnetron.passport.internal.entity.metadata.type;
 
 import com.github.retrooper.packetevents.util.Vector3i;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public record OptPosition(@Nullable Position position) implements MetadataType<Vector3i> {
     @Override

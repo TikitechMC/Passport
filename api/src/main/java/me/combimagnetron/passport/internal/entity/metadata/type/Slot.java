@@ -5,9 +5,9 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 import me.combimagnetron.passport.internal.item.Item;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-public record Slot(@NonNull Item item) implements MetadataType<ItemStack> {
+public record Slot(@NotNull Item item) implements MetadataType<ItemStack> {
 
     public static Slot of(Item item) {
         return new Slot(item);

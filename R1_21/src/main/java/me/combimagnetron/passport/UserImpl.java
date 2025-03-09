@@ -62,4 +62,9 @@ public class UserImpl implements User<Player> {
     public Vector3d rotation() {
         return Vector3d.vec3(player.getLocation().getYaw(), player.getLocation().getPitch(), 0);
     }
+
+    @Override
+    public int gameMode() {
+        return player.getGameMode().ordinal();
+    }
 }
