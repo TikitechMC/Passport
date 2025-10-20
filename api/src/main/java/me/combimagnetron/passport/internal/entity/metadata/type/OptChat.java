@@ -3,9 +3,12 @@ package me.combimagnetron.passport.internal.entity.metadata.type;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record OptChat(@Nullable Component component) implements MetadataType<Component> {
+import java.util.Optional;
+
+public record OptChat(@Nullable Component component) implements MetadataType<Optional<Component>> {
 
     public static OptChat of(@Nullable Component component) {
         return new OptChat(component);
@@ -23,7 +26,7 @@ public record OptChat(@Nullable Component component) implements MetadataType<Com
     }
 
     @Override
-    public @Nullable Component object() {
-        return component;
+    public @NotNull Optional<Component> object() {
+        return Optional.ofNullable(component);
     }
 }

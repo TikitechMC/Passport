@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public sealed interface EventSubscriptionManager<T extends EventSubscription<? extends Event>> permits EventSubscriptionManager.Impl {
+public sealed interface EventSubscriptionManager<T extends EventSubscription<Event>> permits EventSubscriptionManager.Impl {
 
     void subscription(T subscription);
 
@@ -14,22 +14,21 @@ public sealed interface EventSubscriptionManager<T extends EventSubscription<? e
 
     <V extends Event> void unsubscribe(EventSubscription<V> vEventSubscription);
 
-    final class Impl<T extends EventSubscription<? extends Event>> implements EventSubscriptionManager<T> {
-        private final Map<Class<? extends Event>, T> subscriptions = new ConcurrentHashMap<>();
+    final class Impl implements EventSubscriptionManager<EventSubscription<Event>> {
+        private final Map<Class<? extends Event>, EventSubscription<Event>> subscriptions = new ConcurrentHashMap<>();
 
         @Override
-        public void subscription(T subscription) {
+        public void subscription(EventSubscription<Event> subscription) {
             subscriptions.put(subscription.getEventClass(), subscription);
         }
 
-
         @Override
-        public Collection<T> subscriptions() {
+        public Collection<EventSubscription<Event>> subscriptions() {
             return subscriptions.values();
         }
 
         @Override
-        public Map<Class<? extends Event>, T> subscriptionMap() {
+        public Map<Class<? extends Event>, EventSubscription<Event>> subscriptionMap() {
             return subscriptions;
         }
 

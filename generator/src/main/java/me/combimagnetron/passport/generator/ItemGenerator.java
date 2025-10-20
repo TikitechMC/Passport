@@ -21,7 +21,7 @@ public class ItemGenerator {
         }
         //System.out.println(metadata() + header() + content() + "}");
         try {
-            Util.write("api/src/main/java/me/combimagnetron/generated/R" + version.replaceAll("\\.", "_") + "/item/Material.java", metadata() + header(version) + content() + footer());
+            Util.write("api/src/main/java/me/combimagnetron/generated/R" + version.replaceAll("\\.", "_") + "/item/Material_" + version +".java", metadata() + header(version) + content(version) + footer(version));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -78,25 +78,23 @@ public class ItemGenerator {
 
         import me.combimagnetron.passport.internal.registry.Registry;
         import me.combimagnetron.passport.data.Identifier;
+        import me.combimagnetron.passport.internal.item.Material;
 
         import java.util.ArrayList;
         import java.util.List;
         import java.util.Map;
         
-        public interface Material {
-            Registry<Material> REGISTRY = Registry.empty();
-        """;
+        """ + "public record Material_" + version + "(int material, Identifier identifier) implements Material {\n" +
+                "      public static final Registry<Material> REGISTRY = Registry.empty();\n";
+
     }
 
-    private String footer() {
+    private String footer(String version) {
         return """
           \s
-           int material();
-          \s
-           Identifier identifier();
-          \s
            static Material of(int id, Identifier identifier) {
-               Material material = new Impl(id, identifier);
+                Material material = new Material_""" + version + """
+               (id, identifier);
                REGISTRY.register(identifier, material);
                return material;
            }
@@ -109,17 +107,14 @@ public class ItemGenerator {
                return ((Registry.Impl<Material>) REGISTRY).registry().values().stream().filter(material -> material.material() == id).findFirst().orElseThrow();
            }
              \s
-           record Impl(int material, Identifier identifier) implements Material {
-                  \s
-           }
        }
        \s""";
     }
 
-    private String content() {
+    private String content(String version) {
         StringBuilder builder = new StringBuilder();
         for (JsonItem item : items) {
-            builder.append("    Material").append(" ").append(item.name().toUpperCase()).append(" = Material.of(").append(item.id).append(", Identifier.of(\"minecraft\", \"").append(item.name).append("\"));\n");
+            builder.append("    public static final Material").append(" ").append(item.name().toUpperCase()).append(" = Material_").append(version).append(".of(").append(item.id).append(", Identifier.of(\"minecraft\", \"").append(item.name).append("\"));\n");
         }
         return builder.toString();
     }

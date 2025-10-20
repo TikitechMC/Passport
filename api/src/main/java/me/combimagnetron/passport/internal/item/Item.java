@@ -1,25 +1,17 @@
 package me.combimagnetron.passport.internal.item;
 
-import me.combimagnetron.generated.R1_21.item.Material;
+import me.combimagnetron.passport.internal.item.Material;
+import me.combimagnetron.passport.data.Identifier;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.jglrxavpok.hephaistos.nbt.NBT;
-import org.jglrxavpok.hephaistos.nbt.NBTCompound;
-import org.jglrxavpok.hephaistos.nbt.NBTType;
-import org.jglrxavpok.hephaistos.nbt.mutable.MutableNBTCompound;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public interface Item {
-
-    Item customModelData(int customModelData);
-
-    Item name(Component name);
-
-    Item lore(Component... lore);
 
     Material material();
 
@@ -29,9 +21,11 @@ public interface Item {
 
     int amount();
 
+    CompoundBinaryTag nbt();
+
     Collection<Component> lore();
 
-    NBTCompound nbt();
+    Item component(ItemComponent<?> component);
 
     static Item item(Material material) {
         return Impl.item(material);
@@ -45,11 +39,28 @@ public interface Item {
         return Impl.empty();
     }
 
+    class ItemComponentMap {
+        private final ConcurrentHashMap<Identifier, ItemComponent<?>> map = new ConcurrentHashMap<>();
+
+        public void put(Identifier key, ItemComponent<?> value) {
+            map.put(key, value);
+        }
+
+        public <V> ItemComponent<V> get(Identifier key) {
+            return (ItemComponent<V>) map.get(key);
+        }
+
+        public <V> ItemComponent<V> get(ItemComponent.ItemComponentType<V> type) {
+            return (ItemComponent<V>) map.get(type.identifier());
+        }
+
+    }
+
     class Impl implements Item {
         private final static Impl EMPTY = Impl.item(Material.AIR);
-        private List<Component> lore = new ArrayList<>();
-        private MutableNBTCompound nbtCompound;
-        private MutableNBTCompound tag;
+        private final ItemComponentMap componentMap = new ItemComponentMap();
+        private final List<Component> lore = new ArrayList<>();
+        private final CompoundBinaryTag.Builder nbtCompound = CompoundBinaryTag.builder();
         private int amount;
         private final Material material;
         private int customModelData;
@@ -58,11 +69,8 @@ public interface Item {
         private Impl(Material material, int amount) {
             this.material = material;
             this.amount = amount;
-            this.nbtCompound = NBTCompound.EMPTY.toMutableCompound();
-            //this.nbtCompound.set("id", NBT.Int((int) material));
-            this.nbtCompound.set("count", NBT.Byte(amount));
-            this.tag = nbtCompound.set("tag", NBTCompound.EMPTY);
-            this.tag.set("display", NBTCompound.EMPTY);
+            nbtCompound.putInt("id", material.material());
+            nbtCompound.putByte("count", (byte) amount);
         }
 
         public static Impl item(Material material) {
@@ -75,30 +83,6 @@ public interface Item {
 
         public static Impl empty() {
             return EMPTY;
-        }
-
-        public Impl customModelData(int customModelData) {
-            this.customModelData = customModelData;
-            this.nbtCompound.set("CustomModelData", NBT.Int(this.customModelData));
-            return this;
-        }
-
-        public Impl name(Component name) {
-            this.name = name;
-            this.nbtCompound.getCompound("display")
-                    .modify(builder -> builder.set("Name", NBT.String(GsonComponentSerializer.gson().serialize(this.name))));
-            return this;
-        }
-
-        public Impl lore(Component... lore) {
-            this.lore.addAll(List.of(lore));
-            this.nbtCompound.getCompound("display")
-                    .modify(builder -> {
-                        builder.set("Lore", NBT.List(
-                                NBTType.TAG_String, this.lore.stream().map(component -> NBT.String(GsonComponentSerializer.gson().serialize(component))).toList()
-                        ));
-                    });
-            return this;
         }
 
         public Material material() {
@@ -121,45 +105,17 @@ public interface Item {
             return this.lore;
         }
 
-        public NBTCompound nbt() {
-            return nbtCompound.toCompound();
+        @Override
+        public Item component(ItemComponent<?> component) {
+            componentMap.put(component.type().identifier(), component);
+            return this;
+        }
+
+        public CompoundBinaryTag nbt() {
+            return nbtCompound.build();
         }
 
         public record Slot(Impl item, int slot) {
-
-        }
-
-        public interface NbtAdapter<T> {
-            NbtAdapter<Integer> INT = AdapterImpl.of(nbt -> (int) nbt.getValue(), NBT::Int);
-            NbtAdapter<String> STRING = AdapterImpl.of(nbt -> (String) nbt.getValue(), NBT::String);
-
-            NBT nbt(T object);
-
-            T object(NBT nbt);
-
-            class AdapterImpl<T> implements NbtAdapter<T> {
-                private final Function<NBT, T> objectFunction;
-                private final Function<T, NBT> nbtFunction;
-
-                public static <V> NbtAdapter<V> of(Function<NBT, V> objectFunction, Function<V, NBT> nbtFunction) {
-                    return new AdapterImpl<>(objectFunction, nbtFunction);
-                }
-
-                private AdapterImpl(Function<NBT, T> objectFunction, Function<T, NBT> nbtFunction) {
-                    this.nbtFunction = nbtFunction;
-                    this.objectFunction = objectFunction;
-                }
-
-                @Override
-                public NBT nbt(T object) {
-                    return nbtFunction.apply(object);
-                }
-
-                @Override
-                public T object(NBT nbt) {
-                    return objectFunction.apply(nbt);
-                }
-            }
 
         }
 

@@ -55,6 +55,12 @@ public sealed interface Config permits Config.Impl {
 
         }
 
+        public Collection<ConfigElement> manyFlagged() {
+            List<ConfigElement> elements = new ArrayList<>(nodes.values().stream().filter(node -> node instanceof Node.SimpleNode<?> simpleNode && simpleNode.manyFlagged).map(node -> (ConfigElement) node).toList());
+            elements.addAll(sections.values().stream().flatMap(section -> section.elements().stream()).filter(section -> section instanceof Section.RequiredSection requiredSection && requiredSection.manyFlagged).toList());
+            return elements;
+        }
+
         @Override
         public <T> Config node(Node<T> node) {
             this.nodes.put(node.name(), node);

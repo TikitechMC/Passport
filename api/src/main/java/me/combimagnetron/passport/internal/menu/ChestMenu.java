@@ -1,5 +1,14 @@
 package me.combimagnetron.passport.internal.menu;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import me.combimagnetron.passport.util.Pos2D;
 import me.combimagnetron.passport.internal.network.Connection;
 import me.combimagnetron.passport.internal.item.Item;
@@ -7,25 +16,14 @@ import me.combimagnetron.passport.user.User;
 import me.combimagnetron.passport.util.Pair;
 import net.kyori.adventure.text.Component;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface ChestMenu {
+public interface ChestMenu extends ContainerMenu {
 
-    Contents contents();
-
-    Title title();
-
-    void title(Title title);
-
-    void item(Pos2D pos2D, Item item);
-
-    //void click(ServerClickContainer packet);
+    void click(Pos2D click);
 
     static ChestMenu menu(User<?> viewer) {
         return new Impl(viewer);
@@ -41,20 +39,20 @@ public interface ChestMenu {
         public Impl(User<?> viewer) {
             this.viewer = viewer;
             this.connection = viewer.connection();
-            this.title = Title.fixed(Component.text("Sunscreen Menu #" + (windowId * -1)));
+            this.title = Title.fixed(Component.text("Sunscreen Menu #" + windowId));
             open();
         }
 
         private void open() {
-            //final ClientOpenScreen openScreen = ClientOpenScreen.of(windowId, 5, title.next());
-            //final ClientSetScreenContent setScreenContent = ClientSetScreenContent.of(contents.all(), AdapterImpl.empty(), 0, windowId);
-            //connection.send(openScreen);
-            //connection.send(setScreenContent);
-            //refresh();
+            final WrapperPlayServerOpenWindow openWindow = new WrapperPlayServerOpenWindow(windowId, 8, title.next());
+            final WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(windowId, 0, contents.pairStream().map(Pair::second).toList().stream().map(item -> ItemStack.builder().amount(item.amount()).type(ItemTypes.getById(ClientVersion.V_1_21_4, item.material().material())).build()).toList(), null);
+            connection.send(openWindow);
+            connection.send(windowItems);
         }
 
         private void refresh() {
-            //connection.send(ClientBundleDelimiter.bundleDelimiter(contents.pairStream().map(pair -> ClientSetScreenSlot.of(windowId, 0, pair.first().shortValue(), pair.second())).toList().toArray(new ClientSetScreenSlot[0])));
+            final WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(windowId, 0, contents.pairStream().map(Pair::second).toList().stream().map(item -> ItemStack.builder().amount(item.amount()).type(ItemTypes.getById(ClientVersion.V_1_21_4, item.material().material())).build()).toList(), null);
+            connection.send(windowItems);
         }
 
         @Override
@@ -74,130 +72,34 @@ public interface ChestMenu {
 
         @Override
         public void item(Pos2D pos2D, Item item) {
+            contents.set(pos2D, item);
+        }
 
+        @Override
+        public void close() {
+            connection.send(new WrapperPlayServerCloseWindow(windowId));
+        }
+
+        @Override
+        public int windowId() {
+            return windowId;
+        }
+
+        @Override
+        public void click(Pos2D click) {
+            if (click.x() < 0 || click.y() < 0) {
+                return;
+            }
+            if (click.x() >= contents.rows().size() || click.y() >= contents.sizeVertical()) {
+                return;
+            }
+            PacketEvents.getAPI().getPlayerManager().receivePacket(viewer.platformSpecificPlayer(), new WrapperPlayClientClickWindow(windowId, Optional.empty(), click.yi()* 9 + click.xi(), 0, Optional.of(0), WrapperPlayClientClickWindow.WindowClickType.PICKUP, Optional.empty(), null));
         }
 
         //@Override
         //public void click(ServerClickContainer packet) {
 
         //}
-    }
-
-    final class Contents {
-        private final List<Row> rows = new LinkedList<>();
-        private final Consumer<Contents> updateConsumer;
-
-        private Contents(Consumer<Contents> updateConsumer) {
-            this.updateConsumer = updateConsumer;
-            for (int i = 0; i < 6; i++) {
-                rows.add(i, Row.empty());
-            }
-            for (Row row : rows) {
-                for (int i = 0; i < 9; i++) {
-                    row.list.add(Item.empty());
-                }
-            }
-        }
-
-        public void set(Pos2D pos, Item item) {
-            Row row = rows.get((int) pos.y());
-            row.list.set((int) pos.x(), item);
-            updateConsumer.accept(this);
-        }
-
-        public Item get(Pos2D pos) {
-            Row row = rows.get((int) pos.y());
-            return row.list.get((int) pos.x());
-        }
-
-        public Collection<Item> all() {
-            final LinkedHashSet<Item> items = new LinkedHashSet<>();
-            rows.forEach(row -> items.addAll(row.list));
-            return items;
-        }
-
-        public Row row(int index) {
-            return rows.get(index);
-        }
-
-        public List<Row> rows() {
-            return rows;
-        }
-
-        public Stream<Pair<Integer, Item>> pairStream() {
-            final LinkedList<Pair<Integer, Item>> list = new LinkedList<>();
-            AtomicInteger slot = new AtomicInteger();
-            rows.forEach(row -> list.addAll(row.list.stream().map(item -> Pair.of(slot.getAndIncrement(), item)).toList()));
-            return list.stream();
-        }
-
-        public Column column(int index) {
-            return Column.from(this, index);
-        }
-
-        public int sizeVertical() {
-            return rows.size();
-        }
-
-        public record Row(LinkedList<Item> list) {
-
-            static Row empty() {
-                return new Row(new LinkedList<>());
-            }
-
-            static Row of(LinkedList<Item> list) {
-                return new Row(list);
-            }
-
-        }
-
-        public record Column(LinkedList<Item> list) {
-
-            static Column of(LinkedList<Item> list) {
-                return new Column(list);
-            }
-
-            static Column from(Contents contents, int index) {
-                final LinkedList<Item> itemList = new LinkedList<>();
-                contents.rows.forEach(row -> itemList.add(row.list.get(index)));
-                return new Column(itemList);
-            }
-
-        }
-
-    }
-
-    interface Title {
-
-        Component next();
-
-        static FixedTitle fixed(Component title) {
-            return new FixedTitle(title);
-        }
-
-        static AnimatedTitle animated(Collection<Component> titles) {
-            return new AnimatedTitle(titles);
-        }
-
-        record FixedTitle(Component next) implements Title {
-
-        }
-
-        class AnimatedTitle implements Title {
-            private final List<Component> titles = new LinkedList<>();
-            private int frame = 0;
-
-            AnimatedTitle(Collection<Component> titles) {
-                this.titles.addAll(titles);
-            }
-
-            @Override
-            public Component next() {
-                this.frame = titles.size() > frame + 1 ? 0 : frame + 1;
-                return titles.get(this.frame);
-            }
-        }
-
     }
 
 }

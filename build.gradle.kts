@@ -3,7 +3,7 @@ plugins {
 }
 
 subprojects {
-    val adventureVersion = "4.17.0"
+    val adventureVersion = "4.19.0"
 
     apply(plugin = "java")
     listOf(
@@ -11,10 +11,14 @@ subprojects {
         "net.kyori:adventure-api:$adventureVersion",
         "net.kyori:adventure-text-minimessage:$adventureVersion",
         "net.kyori:adventure-text-serializer-gson:$adventureVersion",
-        "org.apache.commons:commons-lang3:3.16.0",
-        "io.github.jglrxavpok.hephaistos:common:2.6.0"
+        "net.kyori:adventure-nbt:$adventureVersion",
     ).forEach {
         dependencies.add("implementation", it)
+    }
+    listOf(
+        "org.apache.commons:commons-lang3:3.16.0"
+    ).forEach {
+        dependencies.add("compileOnly", it)
     }
 
 }

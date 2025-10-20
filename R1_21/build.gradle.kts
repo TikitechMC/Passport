@@ -18,7 +18,7 @@ java {
 }
 
 dependencies {
-    compileOnly("com.github.retrooper:packetevents-spigot:2.7.1-SNAPSHOT")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.8.0-SNAPSHOT")
     implementation(project(":api"))
     paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
 }

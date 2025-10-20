@@ -18,9 +18,7 @@ val kotlinVersion = "1.7.22"
 dependencies {
     compileOnly("com.google.guava:guava:33.3.0-jre")
     compileOnly("com.typesafe:config:1.4.2")
-    compileOnly(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = kotlinVersion)
-    compileOnly(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = kotlinVersion)
-    compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.8.0")
 }
 
 java {
@@ -31,12 +29,11 @@ publishing {
     repositories {
         maven {
             name = "combimagnetron"
-            url = uri("http://78.47.189.94/releases/")
+            url = uri("https://repo.tikite.ch/releases/")
             credentials(PasswordCredentials::class)
             authentication {
                 create<BasicAuthentication>("basic")
             }
-            isAllowInsecureProtocol = true
         }
     }
     publications {

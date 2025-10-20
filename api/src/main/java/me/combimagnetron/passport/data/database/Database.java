@@ -1,10 +1,6 @@
 package me.combimagnetron.passport.data.database;
 
 import me.combimagnetron.passport.data.Identifier;
-import me.combimagnetron.passport.data.Row;
-
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 public interface Database {
 
@@ -13,6 +9,8 @@ public interface Database {
     Summary save();
 
     Table table(Identifier identifier);
+
+    Query query(Statement statement);
 
     interface DataStorageArguments {
 

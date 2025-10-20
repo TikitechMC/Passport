@@ -1,5 +1,6 @@
 package me.combimagnetron.passport.user;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import me.combimagnetron.passport.internal.entity.Entity;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
@@ -33,6 +34,12 @@ public interface User<T extends Audience> {
      Vector3d rotation();
 
      int gameMode();
+
+     float worldTime();
+
+     void resendInv();
+
+     ClientVersion clientVersion();
 
      /*
      1. UUID -> Unique Identifier

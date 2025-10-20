@@ -30,6 +30,7 @@ public sealed interface Node<T> extends ConfigElement permits Node.SimpleNode {
         private final String name;
         private final T t;
         private final Class<T> clazz;
+        public boolean manyFlagged = false;
 
         public SimpleNode(String name, T t) {
             this.name = name;

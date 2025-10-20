@@ -69,7 +69,7 @@ public interface TokenMatcher {
                     if (optionalResult.isEmpty() && token instanceof MatcherToken.RequiredMatcherToken) {
                         continue;
                     } else if (optionalResult.isEmpty()) {
-                        throw new SatelliteSyntaxError("Token not found: " + type);
+                        continue;
                     }
                     String result = optionalResult.get().group();
                     entries.put(new TokenizedResult.TokenizedResultEntry(entry.getKey(), type), result);

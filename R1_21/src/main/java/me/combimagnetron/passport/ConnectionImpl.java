@@ -2,15 +2,19 @@ package me.combimagnetron.passport;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.papermc.paper.network.ChannelInitializeListenerHolder;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 import me.combimagnetron.passport.internal.network.packet.ClientPacket;
 import me.combimagnetron.passport.internal.network.packet.Packet;
 import me.combimagnetron.passport.user.User;
+import net.kyori.adventure.key.Key;
 import net.minecraft.network.Connection;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftEntity;
@@ -28,7 +32,7 @@ public class ConnectionImpl //implements //me.combimagnetron.passport.internal.n
     private final Player player;
     private final User<Player> user;
     private final Passport<JavaPlugin> library;
-    private ChannelPipeline channelPipeline;
+    private Channel channel;
 
     public static ConnectionImpl of(User<Player> user, Passport<JavaPlugin> library) {
         return new ConnectionImpl(user, library);
@@ -41,10 +45,26 @@ public class ConnectionImpl //implements //me.combimagnetron.passport.internal.n
         inject();
     }
 
+    class ChannelInjector extends ChannelDuplexHandler {
+        private final Passport<JavaPlugin> library;
+        private final User<Player> user;
+
+        protected ChannelInjector(Passport<JavaPlugin> library, User<Player> user) {
+            this.library = library;
+            this.user = user;
+        }
+
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, @NotNull Object message) throws Exception {
+            super.channelRead(ctx, message);
+        }
+
+    }
+
     private void inject() {
-        ServerGamePacketListenerImpl serverGamePacketListener = ((CraftPlayer) player).getHandle().connection;
-        Connection connection = serverGamePacketListener.connection;
-        this.channelPipeline = connection.channel.pipeline().addLast(new ChannelInjector(library, user));
+        MinecraftServer.getServer().getConnection().getConnections().stream().filter(connection -> connection.getPlayer().getUUID().equals(player.getUniqueId())).findFirst().ifPresent(connection -> {
+            this.channel = connection.channel;
+        });
     }
 
     //@Override
@@ -65,23 +85,6 @@ public class ConnectionImpl //implements //me.combimagnetron.passport.internal.n
         byte[] output = new byte[bytes.length];
         deflater.deflate(output);
         deflater.end();
-        channelPipeline.write(Unpooled.wrappedBuffer(output));
-    }
-
-    protected static class ChannelInjector extends ChannelDuplexHandler {
-        private final Passport<JavaPlugin> library;
-        private final User<Player> user;
-
-        protected ChannelInjector(Passport<JavaPlugin> library, User<Player> user) {
-            this.library = library;
-            this.user = user;
-        }
-
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, @NotNull Object message) throws Exception {
-            super.channelRead(ctx, message);
-        }
-
     }
 
     private static class Decoder extends ByteToMessageDecoder {

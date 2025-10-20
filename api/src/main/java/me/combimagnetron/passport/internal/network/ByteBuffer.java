@@ -12,23 +12,19 @@ import me.combimagnetron.passport.user.User;
 import me.combimagnetron.passport.util.ProtocolUtil;
 import me.combimagnetron.passport.util.Values;
 import me.combimagnetron.passport.util.VarInt;
+import net.kyori.adventure.nbt.BinaryTagTypes;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.jglrxavpok.hephaistos.nbt.CompressedProcesser;
-import org.jglrxavpok.hephaistos.nbt.NBTException;
-import org.jglrxavpok.hephaistos.nbt.NBTReader;
-import org.jglrxavpok.hephaistos.nbt.NBTWriter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ByteBuffer {
-    private java.nio.ByteBuffer buffer;
+    private final java.nio.ByteBuffer buffer;
     public static ByteBuffer of(byte[] bytes) {
         return new ByteBuffer(bytes);
     }
@@ -39,7 +35,7 @@ public class ByteBuffer {
         this.buffer = java.nio.ByteBuffer.wrap(bytes);
     }
     private ByteBuffer() {
-        this.buffer = java.nio.ByteBuffer.allocate(7000000);
+        this.buffer = java.nio.ByteBuffer.allocate(1024);
     }
     public <T> ByteBuffer write(Adapter<T> type, T object) {
         type.write(buffer, object);
@@ -168,31 +164,33 @@ public class ByteBuffer {
         Adapter<Boolean> BOOLEAN = Impl.of(input -> input.get() == 1, (output, bool) -> output.put(bool ? (byte) 1 : (byte) 0));
         Adapter<Byte> BYTE = Impl.of(java.nio.ByteBuffer::get, java.nio.ByteBuffer::put);
         Adapter<Short> SHORT = Impl.of(java.nio.ByteBuffer::getShort, java.nio.ByteBuffer::putShort);
-        Adapter<org.jglrxavpok.hephaistos.nbt.NBT> NBT = Impl.of(
+        Adapter<CompoundBinaryTag> COMPOUND_BINARY_TAG = Impl.of(
             input -> {
-                NBTReader nbtReader = new NBTReader(new InputStream() {
-                    @Override
-                    public int read() {
-                        return input.get() & 0xFF;
-                    }
-                }, CompressedProcesser.NONE);
                 try {
-                    return nbtReader.read();
-                } catch (IOException | NBTException e) {
+                    final DataInput dataInput = new DataInputStream(new InputStream() {
+                        @Override
+                        public int read() {
+                            return input.get() & 0xFF;
+                        }
+                    });
+                    return BinaryTagTypes.COMPOUND.read(dataInput);
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }, (output, value) -> {
-                    NBTWriter nbtWriter = new NBTWriter(new OutputStream() {
-                        @Override
-                        public void write(int b) {
-                            output.put((byte) b);
-                        }
-                    }, CompressedProcesser.NONE);
-                    try {
-                        nbtWriter.writeNamed("", value);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                try (OutputStream stream = new OutputStream() {
+                    @Override
+                    public void write(int b) {
+                        output.put((byte) b);
                     }
+                }) {
+                    try (final DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(stream))) {
+                        BinaryTagTypes.COMPOUND.write(value, dos);
+                        dos.flush();
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             });
         Adapter<UUID> UUID = Impl.of(input -> new UUID(input.getLong(), input.getLong()), (output, uuid) -> {
             output.putLong(uuid.getMostSignificantBits());
@@ -212,11 +210,7 @@ public class ByteBuffer {
             buffer.put((byte) (value & 0xFF));
         });
         Adapter<Item> ITEM = Impl.of(input -> {
-            if (!(input.get() == 0)) {
-                //return Item.empty();
-            }
-            int material = VarInt.of(input).value();
-            int amount = input.get();
+            CompoundBinaryTag nbt = COMPOUND_BINARY_TAG.read(input);
             return null;
             //return Item.item(Material.direct(material), amount);
         }, ((output, item) -> {
@@ -224,16 +218,17 @@ public class ByteBuffer {
             if (item == null) {
                 return;
             }
-            //VarInt.of(item.material().material()).write(output);
-            /*(output.put((byte) item.amount());
+            VarInt.of(item.material().material()).write(output);
+            output.put((byte) item.amount());
             if (item.nbt().isEmpty()) {
                 output.put((byte) 0);
                 return;
             }
             ByteBuffer byteBuffer = ByteBuffer.empty();
-            byteBuffer.write(NBT, item.nbt());
-            output.put(byteBuffer.bytes());*/
+            byteBuffer.write(COMPOUND_BINARY_TAG, item.nbt());
+            output.put(byteBuffer.bytes());
         }));
+        @SuppressWarnings("rawtypes")
         Adapter<Enum> ENUM = Impl.of(input -> {
             int ordinal = VarInt.of(input).value();
             return null;
@@ -297,11 +292,11 @@ public class ByteBuffer {
         });
         Adapter<Type> TYPE = Impl.of(input -> {
             final String typeName = STRING.read(input);
-            final Type type = null;//Type.find(typeName);
-            if (type == null) {
+            //Type.find(typeName);
+            /*if (type == null) {
                 throw new IllegalArgumentException("Unknown type: " + typeName);
-            }
-            return type;
+            }*/
+            return null;
         }, (output, type) -> {
             BYTE_ARRAY.write(output, type.write());
         });
@@ -320,7 +315,7 @@ public class ByteBuffer {
         });
         Adapter<Integer> VAR_INT = Impl.of(input -> VarInt.of(input).value(), (output, i) -> VarInt.of(i).write(output));
         Adapter<Long> VAR_LONG = Impl.of(ProtocolUtil::readVarLong, ProtocolUtil::writeVarLong);
-        Values<Adapter<?>> VALUES = Values.of(STRING, METADATA, LONG, DOUBLE, USER, FLOAT, INT, IDENTIFIER, BOOLEAN, BYTE, SHORT, UUID, NBT, ITEM, VAR_INT, VAR_LONG);
+        Values<Adapter<?>> VALUES = Values.of(STRING, METADATA, LONG, DOUBLE, USER, FLOAT, INT, IDENTIFIER, BOOLEAN, BYTE, SHORT, UUID, COMPOUND_BINARY_TAG, ITEM, VAR_INT, VAR_LONG);
         T read(java.nio.ByteBuffer byteArrayDataInput);
         void write(java.nio.ByteBuffer output, T object);
         final class Impl<V> implements Adapter<V> {

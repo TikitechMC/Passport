@@ -4,7 +4,9 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 import org.jetbrains.annotations.Nullable;
 
-public record OptPosition(@Nullable Position position) implements MetadataType<Vector3i> {
+import java.util.Optional;
+
+public record OptPosition(@Nullable Position position) implements MetadataType<Optional<Vector3i>> {
     @Override
     public byte[] bytes() {
         final ByteBuffer buffer = ByteBuffer.empty();
@@ -16,8 +18,13 @@ public record OptPosition(@Nullable Position position) implements MetadataType<V
         return buffer.bytes();
     }
 
+    public static OptPosition of(@Nullable Position position) {
+        return new OptPosition(position);
+    }
+
     @Override
-    public Vector3i object() {
-        return new Vector3i(position.x(), position.y(), position.z());
+    public Optional<Vector3i> object() {
+        var obj = position == null ? null : new Vector3i(position.x(), position.y(), position.z());
+        return Optional.ofNullable(obj);
     }
 }

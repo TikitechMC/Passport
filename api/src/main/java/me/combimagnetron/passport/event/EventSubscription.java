@@ -29,6 +29,12 @@ sealed public interface EventSubscription<V extends Event> permits EventSubscrip
             if (eventClass.isAssignableFrom(Event.FilteredEvent.class)) {
                 throw new IllegalArgumentException("FilteredEvent implementations can only be used with EventFilters present!");
             }
+            subscribe();
+        }
+
+        private void subscribe() {
+            EventSubscriptionManager<EventSubscription<Event>> manager = (EventSubscriptionManager<EventSubscription<Event>>) Dispatcher.dispatcher().manager();
+            manager.subscription((EventSubscription<Event>)this);
         }
 
         @Override

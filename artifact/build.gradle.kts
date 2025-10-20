@@ -17,7 +17,7 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(23))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
@@ -30,9 +30,12 @@ tasks {
     shadowJar {
         configurations = listOf(project.configurations.runtimeClasspath.get())
         dependencies {
-            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:.*"))
-            exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:.*"))
-            exclude(dependency("com.google.guava:guava:.*"))
+            exclude(dependency("com.google.guava:guava:31.1-jre"))
+            exclude(dependency("org.apache.commons:commons-lang3:3.17.0"))
+            exclude(dependency("commons-io:commons-io:2.18.0"))
+            exclude(dependency("com.github.ben-manes.caffeine:caffeine:3.2.0"))
+            exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:1.7.22"))
+            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.22"))
         }
     }
 }
@@ -41,12 +44,11 @@ publishing {
     repositories {
         maven {
             name = "combimagnetron"
-            url = uri("http://78.47.189.94/releases/")
+            url = uri("https://repo.tikite.ch/releases/")
             credentials(PasswordCredentials::class)
             authentication {
                 create<BasicAuthentication>("basic")
             }
-            isAllowInsecureProtocol = true
         }
     }
     publications {

@@ -16,7 +16,8 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class Display extends Entity.AbstractEntity {
     protected int interpolationDelay = 0;
-    protected int interpolationDuration = 0;
+    protected int transformationDuration = 0;
+    protected int teleportationDuration = 0;
     protected Transformation transformation = new Transformation(Vector3d.vec3(0, 0, 0), Vector3d.vec3(1, 1, 1), Quaternion.of(0, 0, 0, 1), Quaternion.of(0, 0, 0, 1));
     protected Billboard billboard = Billboard.FIXED;
     protected int brightness = -1;
@@ -89,8 +90,8 @@ public class Display extends Entity.AbstractEntity {
     public Metadata base() {
         return Metadata.of(
                 Pair.of(8, VarInt.of(interpolationDelay())),
-                Pair.of(9, VarInt.of(0)),
-                Pair.of(10, VarInt.of(0)),
+                Pair.of(9, VarInt.of(transformationDuration())),
+                Pair.of(10, VarInt.of(teleportationDuration())),
                 Pair.of(11, transformation().translation()),
                 Pair.of(12, transformation().scale()),
                 Pair.of(13, transformation().rotationLeft()),
@@ -132,13 +133,15 @@ public class Display extends Entity.AbstractEntity {
         this.interpolationDelay = interpolationDelay;
     }
 
-    public int interpolationDuration() {
-        return interpolationDuration;
+    public int transformationDuration() {
+        return transformationDuration;
     }
 
-    public void interpolationDuration(int interpolationDuration) {
-        this.interpolationDuration = interpolationDuration;
+    public void transformationDuration(int transformationDuration) {
+        this.transformationDuration = transformationDuration;
     }
+
+
 
     public Transformation transformation() {
         return transformation;
@@ -190,6 +193,14 @@ public class Display extends Entity.AbstractEntity {
 
     public float height() {
         return height;
+    }
+
+    public int teleportationDuration() {
+        return teleportationDuration;
+    }
+
+    public void teleportationDuration(int teleportationDuration) {
+        this.teleportationDuration = teleportationDuration;
     }
 
     public void setHeight(float height) {

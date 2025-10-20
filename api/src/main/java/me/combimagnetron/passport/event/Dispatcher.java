@@ -6,11 +6,11 @@ import me.combimagnetron.passport.util.Duration;
 
 import java.util.concurrent.TimeUnit;
 
-public sealed interface Dispatcher<T extends Event> permits Dispatcher.SimpleDispatcher {
-    SimpleDispatcher<? extends Event> SIMPLE = new SimpleDispatcher<>();
+public sealed interface Dispatcher<T extends Event, V extends EventSubscription<T>> permits Dispatcher.SimpleDispatcher {
+    SimpleDispatcher<? extends EventSubscription<?>> SIMPLE = new SimpleDispatcher<>();
 
-    static <T extends Event> Dispatcher<T> dispatcher() {
-        return (SimpleDispatcher<T>) SIMPLE;
+    static <V extends EventSubscription<Event>> Dispatcher<Event, V> dispatcher() {
+        return (SimpleDispatcher<V>) SIMPLE;
     }
 
     void postCancellable(Class<T> type, T event);
@@ -23,31 +23,31 @@ public sealed interface Dispatcher<T extends Event> permits Dispatcher.SimpleDis
 
     EventSubscriptionManager<? extends EventSubscription<T>> manager();
 
-    final class SimpleDispatcher<T extends Event> implements Dispatcher<T> {
-        private final EventSubscriptionManager<? extends EventSubscription<T>> subscriptionManager = new EventSubscriptionManager.Impl<>();
+    final class SimpleDispatcher<V extends EventSubscription<Event>> implements Dispatcher<Event, V> {
+        private final EventSubscriptionManager<EventSubscription<Event>> subscriptionManager = new EventSubscriptionManager.Impl();
 
         @Override
-        public void postCancellable(Class<T> type, T event) {
+        public void postCancellable(Class<Event> type, Event event) {
 
         }
 
         @Override
-        public LifeCycle postAsync(Class<T> type, T event) {
+        public LifeCycle postAsync(Class<Event> type, Event event) {
             return Scheduler.run(() -> post(type, event), Duration.of(0, TimeUnit.SECONDS));
         }
 
         @Override
-        public void post(Class<T> type, T event) {
+        public void post(Class<Event> type, Event event) {
             subscriptionManager.subscriptionMap().values().stream().filter(e -> e.getEventClass() == type).forEach(e -> e.handler().accept(event));
         }
 
         @Override
-        public void post(T event) {
-            post((Class<T>) event.getClass(), event);
+        public void post(Event event) {
+            post((Class<Event>) event.getClass(), event);
         }
 
         @Override
-        public EventSubscriptionManager<? extends EventSubscription<T>> manager() {
+        public EventSubscriptionManager<EventSubscription<Event>> manager() {
             return subscriptionManager;
         }
 

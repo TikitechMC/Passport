@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class Main {
-    private final static List<String> VERSIONS = List.of("1.21");
+    private final static List<String> VERSIONS = List.of("1_21_3", "1_21_4");
 
     public static void main(String[] args) {
         for (String version : VERSIONS) {

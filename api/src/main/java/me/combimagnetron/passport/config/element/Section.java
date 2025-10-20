@@ -28,6 +28,7 @@ public interface Section extends ConfigElement {
     final class RequiredSection implements Section {
         private final Map<String, ConfigElement> elements = new LinkedHashMap<>();
         private final String name;
+        public boolean manyFlagged = false;
 
         private RequiredSection(String name) {
             this.name = name;

@@ -12,6 +12,9 @@
 .idea/**/dictionaries
 .idea/**/shelf
 
+# .DS_Store
+**/.DS_Store
+
 *.env
 
 gradle.properties

@@ -2,6 +2,7 @@ package me.combimagnetron.passport.config.annotation.processor;
 
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigObject;
+import com.typesafe.config.ConfigParseOptions;
 import me.combimagnetron.passport.config.Config;
 import me.combimagnetron.passport.config.annotation.*;
 import me.combimagnetron.passport.config.annotation.Optional;
@@ -36,8 +37,47 @@ public class Processor {
     public static Config read(Path path) {
         ConfigObject object = ConfigFactory.parseFile(path.toFile()).root();
         Config config = Config.config();
-        object.unwrapped().forEach(((string, o) -> config.node(Node.required(string, o))));
+        object.unwrapped().forEach(((string, o) -> {
+            if (o instanceof HashMap) {
+                config.section(handleSection((HashMap<String, Object>) o, string));
+                return;
+            }
+            config.node(Node.required(string, o));
+        }
+        ));
         return config;
+    }
+
+    private static me.combimagnetron.passport.config.element.Section handleSection(HashMap<String, Object> values, String name) {
+        me.combimagnetron.passport.config.element.Section section = me.combimagnetron.passport.config.element.Section.required(name);
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            if (entry.getValue() instanceof HashMap) {
+                section.section(handleSection((HashMap<String, Object>) entry.getValue(), entry.getKey()));
+            } else {
+                Node<Object> node = Node.required(entry.getKey(), entry.getValue());
+                section.node(node);
+            }
+        }
+        return section;
+    }
+
+    private static me.combimagnetron.passport.config.element.Section processSection(ProcessedField<?> processedField, me.combimagnetron.passport.config.element.Section section) {
+        Set<Field> fields = Arrays.stream(processedField.type().getFields()).filter(field -> !field.isAnnotationPresent(Excluded.class)).collect(Collectors.toSet());
+        for (Field field : fields) {
+            final ProcessedField<?> processedField1 = ProcessedField.from(field);
+            if (field.isAnnotationPresent(Section.class)) {
+                me.combimagnetron.passport.config.element.Section section1 = me.combimagnetron.passport.config.element.Section.required(processedField1.name());
+                processSection(ProcessedField.from(field), section1);
+                section.section(section1);
+            } else if (field.isAnnotationPresent(Optional.class)) {
+                section.node(Node.optional(processedField1.name(), processedField1.type()));
+            } else if (field.isAnnotationPresent(Required.class)) {
+                section.node(Node.required(processedField1.name(), processedField1.type()));
+            } else if (field.isAnnotationPresent(Anonymous.class)) {
+                section.node(Node.anonymous(processedField1.type()));
+            }
+        }
+        return section;
     }
 
     @NotNull
@@ -49,7 +89,14 @@ public class Processor {
         Set<Field> fields = Arrays.stream(clazz.getFields()).filter(field -> !field.isAnnotationPresent(Excluded.class)).collect(Collectors.toSet());
         for (Field field : fields) {
             final ProcessedField<?> processedField = ProcessedField.from(field);
-            if (field.isAnnotationPresent(Optional.class)) {
+            if (field.isAnnotationPresent(Section.class)) {
+                me.combimagnetron.passport.config.element.Section section = me.combimagnetron.passport.config.element.Section.required(processedField.name());
+                processSection(ProcessedField.from(field), section);
+                config.section(section);
+                if (field.isAnnotationPresent(Many.class)) {
+                    ((me.combimagnetron.passport.config.element.Section.RequiredSection) section).manyFlagged = true;
+                }
+            } else if (field.isAnnotationPresent(Optional.class)) {
                 config.node(Node.optional(processedField.name(), processedField.type()));
             } else if (field.isAnnotationPresent(Required.class)) {
                 config.node(Node.required(processedField.name(), processedField.type()));

@@ -38,7 +38,7 @@ public interface Operator {
 
         @Override
         public Condition.Result eval(Object first, Object second) {
-            return Condition.Result.of(first == second, "");
+            return Condition.Result.of(first.equals(second), "");
         }
 
         @Override
@@ -73,7 +73,7 @@ public interface Operator {
 
         @Override
         public Condition.Result eval(Object first, Object second) {
-            return Condition.Result.of((Double) first > (Double) second, "");
+            return Condition.Result.of(Double.parseDouble((String) first) > Double.parseDouble((String) second), "");
         }
 
         @Override
@@ -90,7 +90,7 @@ public interface Operator {
 
         @Override
         public Condition.Result eval(Object first, Object second) {
-            return Condition.Result.of((Double) first >= (Double) second, "");
+            return Condition.Result.of(Double.parseDouble((String) first) >= Double.parseDouble((String) second), "");
         }
 
         @Override
@@ -107,7 +107,7 @@ public interface Operator {
 
         @Override
         public Condition.Result eval(Object first, Object second) {
-            return Condition.Result.of((Double) first < (Double) second, "");
+            return Condition.Result.of(Double.parseDouble((String) first) < Double.parseDouble((String) second), "");
         }
 
         @Override
@@ -124,7 +124,7 @@ public interface Operator {
 
         @Override
         public Condition.Result eval(Object first, Object second) {
-            return Condition.Result.of((Double) first <= (Double) second, "");
+            return Condition.Result.of(Double.parseDouble((String) first) <= Double.parseDouble((String) second), "");
         }
 
         @Override

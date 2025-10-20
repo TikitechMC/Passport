@@ -40,9 +40,9 @@ public interface Entity {
 
     abstract class AbstractEntity implements Entity, Viewable {
         private final Metadata.Template template = Metadata.BASE;
-        private final EntityId id = EntityId.next();
         private final UUID uuid = UUID.randomUUID();
         private final Collection<Viewer> viewers = new HashSet<>();
+        private EntityId id = EntityId.next();
         private boolean onFire = false;
         private boolean crouching = false;
         private boolean sprinting = false;
@@ -69,6 +69,10 @@ public interface Entity {
         public AbstractEntity(Vector3d position) {
             this.position = position;
             prepare();
+        }
+
+        public void id(EntityId id) {
+            this.id = id;
         }
 
         public void onFire(boolean onFire) {
@@ -197,6 +201,10 @@ public interface Entity {
 
         public abstract Metadata extend();
 
+        public Metadata finished() {
+            return Metadata.merge(metadata, extend());
+        }
+
         @Override
         public Vector3d position() {
             return position;
@@ -241,14 +249,14 @@ public interface Entity {
 
         void prepare() {
             this.metadata = template.apply(
-                    Pair.of(0 ,Byte.of((byte)0)),
-                    Pair.of(1 ,VarInt.of(air)),
-                    Pair.of(2 ,OptChat.of(name)),
-                    Pair.of(3 ,Boolean.of(nameVisible)),
-                    Pair.of(4 ,Boolean.of(silent)),
-                    Pair.of(5 ,Boolean.of(noGravity)),
-                    Pair.of(6 ,pose),
-                    Pair.of(7 ,VarInt.of(frozenPowderedSnow))
+                    Pair.of(0, Byte.of((byte)0)),
+                    Pair.of(1, VarInt.of(air)),
+                    Pair.of(2, OptChat.of(name)),
+                    Pair.of(3, Boolean.of(nameVisible)),
+                    Pair.of(4, Boolean.of(silent)),
+                    Pair.of(5, Boolean.of(noGravity)),
+                    Pair.of(6, pose),
+                    Pair.of(7, VarInt.of(frozenPowderedSnow))
             );
         }
 

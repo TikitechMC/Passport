@@ -2,10 +2,8 @@ package me.combimagnetron.passport.internal.entity.impl.display;
 
 import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
+import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
-import me.combimagnetron.passport.internal.entity.metadata.type.Chat;
-import me.combimagnetron.passport.internal.entity.metadata.type.VarInt;
-import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
 import me.combimagnetron.passport.user.User;
 import me.combimagnetron.passport.util.Pair;
 import net.kyori.adventure.text.Component;
@@ -78,7 +76,7 @@ public class TextDisplay extends Display {
 
     @Override
     public Type type() {
-        return new Type.Impl(124, Identifier.of("minecraft", "text_display"), this.extend());
+        return new Type.Impl(126, Identifier.of("minecraft", "text_display"), this.finished());
     }
 
     public static class Options {

@@ -3,6 +3,11 @@ package me.combimagnetron.passport.internal.entity.metadata;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleType;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
+import me.combimagnetron.passport.internal.entity.Entity;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
@@ -16,14 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public interface Metadata {
     Template BASE = Template.of(
-            Pair.of(0 ,Byte.class),
-            Pair.of(1 ,VarInt.class),
-            Pair.of(2 ,OptChat.class),
-            Pair.of(3 ,Boolean.class),
-            Pair.of(4 ,Boolean.class),
-            Pair.of(5 ,Boolean.class),
-            Pair.of(6 ,Pose.class),
-            Pair.of(7 ,VarInt.class));
+            Pair.of(0, Byte.class),
+            Pair.of(1, VarInt.class),
+            Pair.of(2, OptChat.class),
+            Pair.of(3, Boolean.class),
+            Pair.of(4, Boolean.class),
+            Pair.of(5, Boolean.class),
+            Pair.of(6, Pose.class),
+            Pair.of(7, VarInt.class));
 
     Factory FACTORY = new Factory();
 
@@ -31,7 +36,7 @@ public interface Metadata {
 
     ByteBuffer bytes();
 
-    List<EntityData> entityData();
+    List<EntityData<?>> entityData();
 
     @SafeVarargs
     static Metadata inheritAndMerge(Metadata metadata, Pair<Integer, MetadataType<?>>... types) {
@@ -96,9 +101,10 @@ public interface Metadata {
             TYPE_MAP.put(Rotation.class, 9);
             TYPE_MAP.put(Position.class, 10);
             TYPE_MAP.put(OptPosition.class, 11);
-            TYPE_MAP.put(Pose.class, 20);
-            TYPE_MAP.put(Vector3d.class, 26);
-            TYPE_MAP.put(Quaternion.class, 27);
+            TYPE_MAP.put(OptLivingEntityRef.class, 13);
+            TYPE_MAP.put(Pose.class, 21);
+            TYPE_MAP.put(Vector3d.class, 33);
+            TYPE_MAP.put(Quaternion.class, 34);
         }
 
         public static MetadataPair metadataPair(int index, MetadataType<?> type) {
@@ -122,14 +128,18 @@ public interface Metadata {
     }
 
     final class Impl implements Metadata {
-        private final static HashMap<Class<? extends MetadataType<?>>, EntityDataType<?>> TYPES = new HashMap<>();
+        private final static HashMap<Class<? extends MetadataType<?>>, EntityDataType> TYPES = new HashMap<>();
         private final Holder holder = new Holder();
 
         static {
             TYPES.put(Boolean.class, EntityDataTypes.BOOLEAN);
             TYPES.put(Byte.class, EntityDataTypes.BYTE);
             TYPES.put(Chat.class, EntityDataTypes.ADV_COMPONENT);
+            TYPES.put(Int.class, EntityDataTypes.INT);
             TYPES.put(Float.class, EntityDataTypes.FLOAT);
+            TYPES.put(OptLivingEntityRef.class, EntityDataTypes.OPTIONAL_UUID);
+            TYPES.put(ParticleList.class, EntityDataTypes.PARTICLES);
+            TYPES.put(OptPosition.class, EntityDataTypes.OPTIONAL_BLOCK_POSITION);
             TYPES.put(OptChat.class, EntityDataTypes.OPTIONAL_ADV_COMPONENT);
             TYPES.put(Pose.class, EntityDataTypes.ENTITY_POSE);
             TYPES.put(Position.class, EntityDataTypes.BLOCK_POSITION);
@@ -159,10 +169,16 @@ public interface Metadata {
         }
 
         @Override
-        public List<EntityData> entityData() {
-            final List<EntityData> data = new ArrayList<>();
+        public List<EntityData<?>> entityData() {
+            final List<EntityData<?>> data = new ArrayList<>();
             holder.metadataTypes.forEach((index, type) -> {
-                data.add(new EntityData(index, TYPES.get(type.type.getClass()), type.type.object()));
+                Object object = type.type.object();
+                if (type.type instanceof ParticleList list) {
+                    List<Particle<?>> list1 = new ArrayList<>();
+                    list.object().forEach(particle -> list1.add(new Particle<>(ParticleTypes.ASH, ParticleData.emptyData())));
+                    object = list1;
+                }
+                data.add(new EntityData<>(index, TYPES.get(type.type.getClass()), object));
             });
             return data;
         }

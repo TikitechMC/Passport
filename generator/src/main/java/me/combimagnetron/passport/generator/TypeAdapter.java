@@ -38,20 +38,22 @@ public interface TypeAdapter<T> {
     TypeAdapter<Enum> ENUM = new Impl<>(Enum.class, "var_int_enum", "ENUM");
     Values<TypeAdapter<?>> VALUES = Values.of(BYTE, OPTIONAL_VAR_INT, METADATA, IDENTIFIER, SHORT, INT, LONG, FLOAT, DOUBLE, STRING, BYTE_ARRAY, BOOLEAN, VAR_INT, UUID, OPTIONAL_COMPONENT, OPTIONAL_STRING, UUID_OPTIONAL, BLOCK_POSITION, UNSIGNED_SHORT, ENUM);
 
-    //Enum and optional to implementations instead of this shit
-    //Array byteBuffer type
-    //ENUM types, Json Text Component, Optional datatypes, NBT, BitSet, Identifier, Optional Text Component, Unsigned Byte, angle, Slot
-    //Login ClientLoginSuccess Propetry
-    //Config ClientRegistryData             fix registry array
-    //Config ClientUpdateTags,              fix tags array
-    //Config ClientClientboundKnownPacks    fix known packs array
-    //Config ClientCustomReportDetails,     fix details array
-    //Config ClientServerLinks,             fix links array
-    //Config ServerboundKnownPacks          fix known packs array
-    //Play ClientAwardStatistics,           fix statistics array
-    //Play ClientBossBar                    fix action thing
-    //Play ClientChunkBiomes                fix chunk biome data array
-    //Play ClientCommandSuggestionsResponse fix matches array
+    /*
+    Enum and optional to implementations instead of this shit
+    Array byteBuffer type
+    ENUM types, Json Text Component, Optional datatypes, NBT, BitSet, Identifier, Optional Text Component, Unsigned Byte, angle, Slot
+    Login ClientLoginSuccess Propetry
+    Config ClientRegistryData             fix registry array
+    Config ClientUpdateTags,              fix tags array
+    Config ClientClientboundKnownPacks    fix known packs array
+    Config ClientCustomReportDetails,     fix details array
+    Config ClientServerLinks,             fix links array
+    Config ServerboundKnownPacks          fix known packs array
+    Play ClientAwardStatistics,           fix statistics array
+    Play ClientBossBar                    fix action thing
+    Play ClientChunkBiomes                fix chunk biome data array
+    Play ClientCommandSuggestionsResponse fix matches array
+    */
 
     //FORMAT: array(match:string,has_tooltip:boolean,tooltip:optional_text_component)
 

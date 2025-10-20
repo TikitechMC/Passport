@@ -4,6 +4,7 @@ import me.combimagnetron.passport.data.Identifier;
 import me.combimagnetron.passport.util.Pair;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface Registry<T> {
 
@@ -22,8 +23,8 @@ public interface Registry<T> {
     }
 
     class Impl<T> implements Registry<T> {
-        private final Map<Identifier, T> registry = new java.util.HashMap<>();
-        private final Map<T, Identifier> reverseRegistry = new java.util.HashMap<>();
+        private final Map<Identifier, T> registry = new ConcurrentHashMap<>();
+        private final Map<T, Identifier> reverseRegistry = new ConcurrentHashMap<>();
 
         public T get(Identifier key) {
             return registry.get(key);
