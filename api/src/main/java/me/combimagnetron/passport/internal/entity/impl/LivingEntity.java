@@ -1,6 +1,6 @@
 package me.combimagnetron.passport.internal.entity.impl;
 
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.Entity;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;

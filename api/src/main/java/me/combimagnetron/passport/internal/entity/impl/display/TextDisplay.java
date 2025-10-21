@@ -1,6 +1,7 @@
 package me.combimagnetron.passport.internal.entity.impl.display;
 
-import me.combimagnetron.passport.data.Identifier;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
@@ -76,7 +77,7 @@ public class TextDisplay extends Display {
 
     @Override
     public Type type() {
-        return new Type.Impl(126, Identifier.of("minecraft", "text_display"), this.finished());
+        return new Type.Impl(EntityTypes.TEXT_DISPLAY, Identifier.of("minecraft", "text_display"), this.finished());
     }
 
     public static class Options {

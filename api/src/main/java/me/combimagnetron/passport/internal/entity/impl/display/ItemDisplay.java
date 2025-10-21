@@ -1,7 +1,8 @@
 package me.combimagnetron.passport.internal.entity.impl.display;
 
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import me.combimagnetron.generated.R1_21_4.item.Material_1_21_4;
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
 import me.combimagnetron.passport.internal.entity.metadata.type.Slot;
@@ -26,7 +27,7 @@ public class ItemDisplay extends Display {
 
     @Override
     public Type type() {
-        return new Type.Impl(69, Identifier.of("minecraft", "item_display"), this.finished());
+        return new Type.Impl(EntityTypes.ITEM_DISPLAY, Identifier.of("minecraft", "item_display"), this.finished());
     }
 
     public enum DisplayType {

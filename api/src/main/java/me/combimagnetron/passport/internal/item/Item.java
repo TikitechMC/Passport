@@ -1,7 +1,7 @@
 package me.combimagnetron.passport.internal.item;
 
 import me.combimagnetron.passport.internal.item.Material;
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 

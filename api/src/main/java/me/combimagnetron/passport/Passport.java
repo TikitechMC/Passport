@@ -1,5 +1,6 @@
 package me.combimagnetron.passport;
 
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import me.combimagnetron.passport.user.User;
 import me.combimagnetron.passport.user.UserHandler;
 import me.combimagnetron.passport.util.placeholder.PlaceholderRegistry;
@@ -24,6 +25,8 @@ public interface Passport<T> {
     default Logger logger() {
         return LoggerFactory.getLogger(Passport.class);
     }
+
+    PacketEventsAPI<?> packetEventsApi();
 
     T plugin();
 

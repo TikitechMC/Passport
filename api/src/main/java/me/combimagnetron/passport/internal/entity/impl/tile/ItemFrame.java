@@ -1,6 +1,7 @@
 package me.combimagnetron.passport.internal.entity.impl.tile;
 
-import me.combimagnetron.passport.data.Identifier;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.Entity;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Slot;
@@ -30,7 +31,7 @@ public class ItemFrame extends Entity.AbstractEntity {
     @Override
     public Type type() {
         return new Type.Impl(
-                70,
+                EntityTypes.ITEM_DISPLAY,
                 Identifier.of("minecraft", "item_frame"),
                 this.extend()
         );

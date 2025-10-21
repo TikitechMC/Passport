@@ -13,7 +13,6 @@ repositories {
 
 dependencies {
     implementation(project(":api"))
-    implementation(project(":R1_21"))
 }
 
 java {

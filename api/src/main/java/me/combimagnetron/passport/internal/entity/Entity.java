@@ -1,11 +1,14 @@
 package me.combimagnetron.passport.internal.entity;
 
-import me.combimagnetron.passport.data.Identifier;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import me.combimagnetron.passport.Passport;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.*;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
 import me.combimagnetron.passport.internal.entity.metadata.type.Byte;
 import me.combimagnetron.passport.util.Pair;
+import me.combimagnetron.passport.util.data.Identifier;
 import net.kyori.adventure.text.Component;
 
 import java.util.Collection;
@@ -287,8 +290,12 @@ public interface Entity {
             return null;
         }
 
-        record Impl(int id, Identifier identifier, Metadata metadata) implements Type {
+        record Impl(EntityType entityType, Identifier identifier, Metadata metadata) implements Type {
 
+            @Override
+            public int id() {
+                return entityType.getId(Passport.passport().packetEventsApi().getServerManager().getVersion().toClientVersion());
+            }
         }
 
     }

@@ -3,7 +3,7 @@
 package me.combimagnetron.generated.R1_21_4.item;
 
 import me.combimagnetron.passport.internal.registry.Registry;
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.item.Material;
 
 import java.util.ArrayList;

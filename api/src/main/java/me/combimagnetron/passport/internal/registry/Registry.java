@@ -1,6 +1,6 @@
 package me.combimagnetron.passport.internal.registry;
 
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.util.Pair;
 
 import java.util.Map;

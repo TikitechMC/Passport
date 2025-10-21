@@ -1,6 +1,6 @@
 package me.combimagnetron.passport.internal.item;
 
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.network.ByteBuffer;
 
 import java.util.LinkedHashMap;

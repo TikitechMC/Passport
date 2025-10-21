@@ -18,6 +18,4 @@ pluginManagement {
 }
 
 include("api")
-include("generator")
-include("R1_21")
 include("artifact")

@@ -3,7 +3,7 @@ package me.combimagnetron.passport.internal.network;
 //import me.combimagnetron.generated.R1_21.item.Material;
 //import me.combimagnetron.generated.R1_21.item.Material;
 import me.combimagnetron.passport.Passport;
-import me.combimagnetron.passport.data.Identifier;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Vector3d;
 import me.combimagnetron.passport.internal.item.Item;

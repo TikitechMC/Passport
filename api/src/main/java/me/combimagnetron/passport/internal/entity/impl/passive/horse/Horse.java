@@ -1,6 +1,9 @@
 package me.combimagnetron.passport.internal.entity.impl.passive.horse;
 
-import me.combimagnetron.passport.data.Identifier;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Int;
 import me.combimagnetron.passport.internal.entity.metadata.type.VarInt;
@@ -30,7 +33,7 @@ public class Horse extends BaseHorse {
 
     @Override
     public Type type() {
-        return new Type.Impl(64, Identifier.of("minecraft", "horse"), finished());
+        return new Type.Impl(EntityTypes.HORSE, Identifier.of("minecraft", "horse"), finished());
     }
 
     public void variant(Variant variant) {

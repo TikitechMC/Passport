@@ -1,6 +1,7 @@
 package me.combimagnetron.passport.internal.entity.impl.passive;
 
-import me.combimagnetron.passport.data.Identifier;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import me.combimagnetron.passport.util.data.Identifier;
 import me.combimagnetron.passport.internal.entity.impl.passive.horse.BaseHorse;
 import me.combimagnetron.passport.internal.entity.metadata.Metadata;
 import me.combimagnetron.passport.internal.entity.metadata.type.Boolean;
@@ -26,7 +27,7 @@ public class Camel extends BaseHorse {
 
     @Override
     public Type type() {
-        return new Type.Impl(19, Identifier.of("minecraft", "camel"), finished());
+        return new Type.Impl(EntityTypes.CAMEL, Identifier.of("minecraft", "camel"), finished());
     }
 
     @Override

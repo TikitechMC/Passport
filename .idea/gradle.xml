@@ -5,14 +5,12 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="openjdk-22" />
+        <option name="gradleJvm" value="azul-22" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/R1_21" />
             <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/artifact" />
-            <option value="$PROJECT_DIR$/generator" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />
