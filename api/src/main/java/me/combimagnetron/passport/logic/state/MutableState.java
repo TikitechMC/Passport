@@ -7,8 +7,14 @@ public interface MutableState<T> extends State<T> {
 
     @NotNull MutableState<T> state(@Nullable T t);
 
+    @Nullable ObservableStateChangeCallback<T> callback();
+
     default @NotNull ObservableMutableState<T> observe(ObservableStateChangeCallback<T> callback) {
         return new ObservableMutableState<>(value(), callback);
+    }
+
+    default <R> @NotNull InlinedMutableState<T, R> inlined() {
+        return new InlinedMutableState.ObservableInlinedMutableState<>(value(), callback());
     }
 
     class SimpleMutableState<T> implements MutableState<T> {
@@ -31,6 +37,11 @@ public interface MutableState<T> extends State<T> {
             this.current = t;
             return this;
         }
+
+        @Override
+        public @Nullable ObservableStateChangeCallback<T> callback() {
+            return null;
+        }
     }
 
     class ObservableMutableState<T> extends SimpleMutableState<T> {
@@ -39,6 +50,11 @@ public interface MutableState<T> extends State<T> {
         ObservableMutableState(T current, ObservableStateChangeCallback<T> callback) {
             super(current);
             this.callback = callback;
+        }
+
+        @Override
+        public @Nullable ObservableStateChangeCallback<T> callback() {
+            return callback;
         }
 
         @Override
